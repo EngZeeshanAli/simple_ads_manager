@@ -7,6 +7,7 @@ import 'package:simple_ads_manager/src/ads/banner.dart';
 import 'package:simple_ads_manager/src/ads/interstitial.dart';
 import 'package:simple_ads_manager/src/models/AdConfig.dart';
 
+import '../simple_ads_manager.dart';
 import 'ads/app_open.dart';
 import 'ads/rewarded.dart';
 
@@ -52,6 +53,10 @@ class SimpleAdsManager {
 
   void showAppOpenAd() {
     AdmobAppOpen.show();
+  }
+
+  void appOpenAdCallback(AdmobAppOpenCallBacks callbacks) {
+    AdmobAppOpen.callbacks = callbacks;
   }
 
   void enableAutoAppOpenAdFeature() {

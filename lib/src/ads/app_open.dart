@@ -1,8 +1,12 @@
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:simple_ads_manager/src/models/AdConfig.dart';
 
+import '../callbacks/admob_app_open_callbacks.dart';
+
 class AdmobAppOpen {
   static AppOpenAd? _appOpenAd;
+
+  static AdmobAppOpenCallBacks? callbacks;
 
   static void loadAppOpen() {
     AppOpenAd.load(
@@ -13,7 +17,9 @@ class AdmobAppOpen {
         onAdLoaded: (ad) {
           _appOpenAd = ad;
         },
-        onAdFailedToLoad: (error) {},
+        onAdFailedToLoad: (error) {
+          print("App Open Failed to Load :  $error");
+        },
       ),
     );
   }
@@ -28,11 +34,13 @@ class AdmobAppOpen {
           loadAppOpen();
         },
         onAdDismissedFullScreenContent: (ad) {
+          callbacks?.onCloseAppOpen();
           ad.dispose();
           _appOpenAd = null;
           loadAppOpen();
         },
       );
+      callbacks?.onShowAppOpens();
       _appOpenAd?.show();
     } else {
       loadAppOpen();
