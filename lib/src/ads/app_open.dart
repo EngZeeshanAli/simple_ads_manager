@@ -1,12 +1,12 @@
-import 'package:google_mobile_ads/google_mobile_ads.dart';
-import 'package:simple_ads_manager/src/models/AdConfig.dart';
 
-import '../callbacks/admob_app_open_callbacks.dart';
+import 'package:flutter/material.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
+import 'package:simple_ads_manager/src/ads/blank_screen.dart';
+import 'package:simple_ads_manager/src/models/AdConfig.dart';
 
 class AdmobAppOpen {
   static AppOpenAd? _appOpenAd;
-
-  static AdmobAppOpenCallBacks? callbacks;
+  static bool showingAd = false;
 
   static void loadAppOpen() {
     AppOpenAd.load(
@@ -24,7 +24,7 @@ class AdmobAppOpen {
     );
   }
 
-  static void show() {
+  static void show(BuildContext context, Function() onDismiss) {
     if (_appOpenAd != null) {
       _appOpenAd!.fullScreenContentCallback = FullScreenContentCallback(
         onAdShowedFullScreenContent: (ad) {},
@@ -34,31 +34,34 @@ class AdmobAppOpen {
           loadAppOpen();
         },
         onAdDismissedFullScreenContent: (ad) {
-          callbacks?.onCloseAppOpen();
+          Navigator.of(context).pop();
           ad.dispose();
           _appOpenAd = null;
           loadAppOpen();
+          onDismiss();
         },
       );
-      callbacks?.onShowAppOpens();
+      Navigator.of(context)
+          .push(MaterialPageRoute(builder: (context) => BlankScreen()));
       _appOpenAd?.show();
     } else {
+      onDismiss();
       loadAppOpen();
     }
   }
 }
 
 class AppLifecycleReactorForAppOpen {
-  void listenToAppStateChanges() {
+  void listenToAppStateChanges(BuildContext context,) {
     AppStateEventNotifier.startListening();
     AppStateEventNotifier.appStateStream
-        .forEach((state) => _onAppStateChanged(state));
+        .forEach((state) => _onAppStateChanged(context,state));
   }
 
-  void _onAppStateChanged(AppState appState) {
+  void _onAppStateChanged(BuildContext context,AppState appState) {
     if (appState == AppState.foreground) {
       print("App is in foreground");
-      AdmobAppOpen.show();
+      AdmobAppOpen.show(context,(){});
     }
   }
 }

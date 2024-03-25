@@ -1,8 +1,13 @@
+import 'package:flutter/material.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
+import 'package:simple_ads_manager/simple_ads_manager.dart';
 import '../models/AdConfig.dart';
+import 'blank_screen.dart';
 
 class AdmobInterstitial {
+
   static InterstitialAd? _interstitialAd;
+  static bool showingAd = false;
 
   static void loadInterstitialAd() {
     InterstitialAd.load(
@@ -20,16 +25,21 @@ class AdmobInterstitial {
     );
   }
 
-  static void showAd(Function() onDismiss) {
+  static void showAd(BuildContext context, Function() onDismiss) {
+
     if (_interstitialAd != null) {
       _interstitialAd?.fullScreenContentCallback = FullScreenContentCallback(
         onAdDismissedFullScreenContent: (ad) {
+          // Navigator.of(context).pop();
           ad.dispose();
           _interstitialAd = null;
           onDismiss();
           loadInterstitialAd();
         },
       );
+
+      // Navigator.of(context)
+      //     .push(MaterialPageRoute(builder: (context) => BlankScreen()));
       _interstitialAd?.show();
     } else {
       AdmobInterstitial.loadInterstitialAd();

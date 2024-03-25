@@ -1,18 +1,19 @@
 import 'dart:async';
-import 'dart:convert';
 
 import 'package:flutter/widgets.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:simple_ads_manager/src/ads/banner.dart';
 import 'package:simple_ads_manager/src/ads/interstitial.dart';
 import 'package:simple_ads_manager/src/models/AdConfig.dart';
-
-import '../simple_ads_manager.dart';
 import 'ads/app_open.dart';
 import 'ads/rewarded.dart';
 
 class SimpleAdsManager {
   SimpleAdsManager._privateConstructor();
+
+  static bool alwaysTestADs = false;
+
+  static bool bannerEnabled = true;
 
   static final SimpleAdsManager _instance =
       SimpleAdsManager._privateConstructor();
@@ -35,6 +36,14 @@ class SimpleAdsManager {
     }
   }
 
+  Future<void> setNavigatorState(dynamic navigatorState) async {
+    navigatorState = navigatorState;
+  }
+
+  Future<void> setAlwaysTestAds() async {
+    SimpleAdsManager.alwaysTestADs = true;
+  }
+
   Future<void> setAdUnits(String jsonAssetName) async {
     AdConfig.setAdUnits(jsonAssetName);
   }
@@ -43,23 +52,20 @@ class SimpleAdsManager {
     return AdMobBanner(bannerAdUnit: AdConfig.instance.ads.banner);
   }
 
-  void showInterstitialAd(Function() onDismiss) {
-    AdmobInterstitial.showAd(onDismiss);
+  void showInterstitialAd(BuildContext context, Function() onDismiss) {
+    AdmobInterstitial.showAd(context, onDismiss);
   }
 
-  void showRewardedAd(Function(RewardItem? reward) onRewarded) {
-    AdMobRewarded.show(onRewarded);
+  void showRewardedAd(
+      BuildContext context, Function(RewardItem? reward) onRewarded) {
+    AdMobRewarded.show(context, onRewarded);
   }
 
-  void showAppOpenAd() {
-    AdmobAppOpen.show();
+  void showAppOpenAd(BuildContext context, Function() onDismiss) {
+    AdmobAppOpen.show(context,onDismiss);
   }
 
-  void appOpenAdCallback(AdmobAppOpenCallBacks callbacks) {
-    AdmobAppOpen.callbacks = callbacks;
-  }
-
-  void enableAutoAppOpenAdFeature() {
-    AppLifecycleReactorForAppOpen().listenToAppStateChanges();
+  void enableAutoAppOpenAdFeature(BuildContext context) {
+    AppLifecycleReactorForAppOpen().listenToAppStateChanges(context);
   }
 }

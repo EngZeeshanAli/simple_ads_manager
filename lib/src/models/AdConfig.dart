@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/services.dart';
+import 'package:simple_ads_manager/simple_ads_manager.dart';
 import 'package:simple_ads_manager/src/models/test_ad_helper.dart';
 import 'package:flutter/foundation.dart';
 
@@ -17,6 +18,7 @@ class AdConfig {
   static AdConfig get instance {
     return _instance ?? AdConfig.fromJson({});
   }
+
 
   static Future<void> setAdUnits(String jsonAssetName) async {
     final String response =
@@ -68,7 +70,7 @@ class _AdsModel {
   }
 
   String get banner {
-    if (kDebugMode) {
+    if (kDebugMode || SimpleAdsManager.alwaysTestADs ==true) {
       return TestAdUnits.bannerAdUnitId;
     } else {
       if (_banner.isEmpty) {
@@ -79,7 +81,7 @@ class _AdsModel {
   }
 
   String get interstitial {
-    if (kDebugMode) {
+    if (kDebugMode|| SimpleAdsManager.alwaysTestADs ==true) {
       return TestAdUnits.interstitialAdUnitId;
     } else {
       if (_interstitial.isEmpty) {
@@ -90,7 +92,7 @@ class _AdsModel {
   }
 
   String get rewardedVideo {
-    if (kDebugMode) {
+    if (kDebugMode|| SimpleAdsManager.alwaysTestADs ==true) {
       return TestAdUnits.rewardedAdUnitId;
     } else {
       if (_rewardedVideo.isEmpty) {
@@ -101,7 +103,7 @@ class _AdsModel {
   }
 
   String get interStitialVideo {
-    if (kDebugMode) {
+    if (kDebugMode|| SimpleAdsManager.alwaysTestADs ==true) {
       return TestAdUnits.rewardedAdUnitId;
     } else {
       if (_interstitialVideo.isEmpty) {
@@ -112,7 +114,7 @@ class _AdsModel {
   }
 
   String get appOpen {
-    if (kDebugMode) {
+    if (kDebugMode|| SimpleAdsManager.alwaysTestADs ==true) {
       return TestAdUnits.appOpenAdUnitId;
     } else {
       if (_appOpen.isEmpty) {

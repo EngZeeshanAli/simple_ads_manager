@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
+import 'package:simple_ads_manager/simple_ads_manager.dart';
 
 class AdMobBanner extends StatefulWidget {
   AdMobBanner({super.key, required this.bannerAdUnit});
@@ -40,12 +41,13 @@ class _AdMobBannerState extends State<AdMobBanner> {
   @override
   void dispose() {
     _bannerAd?.dispose();
+
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    return _bannerAd != null
+    return _bannerAd != null && SimpleAdsManager.bannerEnabled == true
         ? Container(
             width: _bannerAd?.size.width.toDouble(),
             height: _bannerAd?.size.height.toDouble(),
@@ -53,4 +55,5 @@ class _AdMobBannerState extends State<AdMobBanner> {
           )
         : Container();
   }
+
 }
