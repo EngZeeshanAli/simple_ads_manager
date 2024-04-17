@@ -30,7 +30,7 @@ class AdmobInterstitial {
     if (_interstitialAd != null) {
       _interstitialAd?.fullScreenContentCallback = FullScreenContentCallback(
         onAdDismissedFullScreenContent: (ad) {
-          // Navigator.of(context).pop();
+          Navigator.of(context).pop();
           ad.dispose();
           _interstitialAd = null;
           onDismiss();
@@ -38,8 +38,8 @@ class AdmobInterstitial {
         },
       );
 
-      // Navigator.of(context)
-      //     .push(MaterialPageRoute(builder: (context) => BlankScreen()));
+      Navigator.of(context)
+          .push(MaterialPageRoute(builder: (context) => BlankScreen()));
       _interstitialAd?.show();
     } else {
       AdmobInterstitial.loadInterstitialAd();
