@@ -3,9 +3,10 @@ import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:simple_ads_manager/simple_ads_manager.dart';
 
 class AdMobBanner extends StatefulWidget {
-  AdMobBanner({super.key, required this.bannerAdUnit});
+  final Function()? onLoaded;
+  final String bannerAdUnit;
 
-  String bannerAdUnit;
+  const AdMobBanner({super.key, required this.bannerAdUnit, this.onLoaded});
 
   @override
   State<AdMobBanner> createState() => _AdMobBannerState();
@@ -23,6 +24,7 @@ class _AdMobBannerState extends State<AdMobBanner> {
         onAdLoaded: (ad) {
           setState(() {
             _bannerAd = ad as BannerAd;
+            widget.onLoaded?.call();
           });
         },
         onAdFailedToLoad: (ad, err) {
@@ -55,5 +57,4 @@ class _AdMobBannerState extends State<AdMobBanner> {
           )
         : Container();
   }
-
 }

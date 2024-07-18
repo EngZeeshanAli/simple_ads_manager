@@ -1,5 +1,6 @@
-## 0.0.2
+## 0.0.4
 
-## [0.0.2-dev.3]
+## [0.0.4]
 
-- Added feature ads configuration to the plugin.
+- Added show banner call backs 
+

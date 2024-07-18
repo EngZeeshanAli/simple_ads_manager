@@ -11,7 +11,6 @@ class AdmobAppOpen {
   static void loadAppOpen() {
     AppOpenAd.load(
       adUnitId: AdConfig.instance.ads.appOpen,
-      orientation: AppOpenAd.orientationPortrait,
       request: const AdRequest(),
       adLoadCallback: AppOpenAdLoadCallback(
         onAdLoaded: (ad) {

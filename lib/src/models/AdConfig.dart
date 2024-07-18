@@ -7,7 +7,7 @@ import 'package:simple_ads_manager/src/models/test_ad_helper.dart';
 import 'package:flutter/foundation.dart';
 
 class AdConfig {
-  final _AdsModel ads;
+  final AdsModel ads;
 
 // Private constructor
   AdConfig._({required this.ads});
@@ -32,22 +32,23 @@ class AdConfig {
   }
 
   factory AdConfig.fromJson(Map<String, dynamic> json) {
-    if (json.isEmpty)
+    if (json.isEmpty) {
       throw UnsupportedError(
           'No json file found. Add json file in assets folder');
-    _instance ??= AdConfig._(ads: _AdsModel.fromJson(json));
+    }
+    _instance ??= AdConfig._(ads: AdsModel.fromJson(json));
     return _instance!;
   }
 }
 
-class _AdsModel {
+class AdsModel {
   late final String _banner;
   late final String _interstitial;
   late final String _rewardedVideo;
   late final String _interstitialVideo;
   late final String _appOpen;
 
-  _AdsModel(
+  AdsModel(
     this._banner,
     this._interstitial,
     this._rewardedVideo,
@@ -55,12 +56,12 @@ class _AdsModel {
     this._appOpen,
   );
 
-  factory _AdsModel.fromJson(Map<String, dynamic> json) {
+  factory AdsModel.fromJson(Map<String, dynamic> json) {
     if (json.isEmpty) {
       throw UnsupportedError('Ad config is empty');
     }
 
-    return _AdsModel(
+    return AdsModel(
       json['banner'] ?? "",
       json['interstitial'] ?? "",
       json['rewarded_video'] ?? "",

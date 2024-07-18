@@ -16,14 +16,13 @@ class SimpleAdsManager {
   static bool bannerEnabled = true;
 
   static final SimpleAdsManager _instance =
-      SimpleAdsManager._privateConstructor();
+  SimpleAdsManager._privateConstructor();
 
   static SimpleAdsManager get instance => _instance;
 
-  Future<void> init(
-      {bool? appOpen = false,
-      bool interstitial = false,
-      bool rewarded = false}) async {
+  Future<void> init({bool? appOpen = false,
+    bool interstitial = false,
+    bool rewarded = false}) async {
     await MobileAds.instance.initialize();
     if (appOpen!) {
       AdmobAppOpen.loadAppOpen();
@@ -48,21 +47,22 @@ class SimpleAdsManager {
     AdConfig.setAdUnits(jsonAssetName);
   }
 
-  Widget showBanner() {
-    return AdMobBanner(bannerAdUnit: AdConfig.instance.ads.banner);
+  Widget showBanner({Function()? onLoaded }) {
+    return AdMobBanner(
+      bannerAdUnit: AdConfig.instance.ads.banner, onLoaded: onLoaded,);
   }
 
   void showInterstitialAd(BuildContext context, Function() onDismiss) {
     AdmobInterstitial.showAd(context, onDismiss);
   }
 
-  void showRewardedAd(
-      BuildContext context, Function(RewardItem? reward) onRewarded) {
+  void showRewardedAd(BuildContext context,
+      Function(RewardItem? reward) onRewarded) {
     AdMobRewarded.show(context, onRewarded);
   }
 
   void showAppOpenAd(BuildContext context, Function() onDismiss) {
-    AdmobAppOpen.show(context,onDismiss);
+    AdmobAppOpen.show(context, onDismiss);
   }
 
   void enableAutoAppOpenAdFeature(BuildContext context) {
