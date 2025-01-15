@@ -19,7 +19,6 @@ class AdConfig {
     return _instance ?? AdConfig.fromJson({});
   }
 
-
   static Future<void> setAdUnits(String jsonAssetName) async {
     final String response =
         await rootBundle.loadString('assets/$jsonAssetName');
@@ -47,14 +46,10 @@ class AdsModel {
   late final String _rewardedVideo;
   late final String _interstitialVideo;
   late final String _appOpen;
+  late final String _native;
 
-  AdsModel(
-    this._banner,
-    this._interstitial,
-    this._rewardedVideo,
-    this._interstitialVideo,
-    this._appOpen,
-  );
+  AdsModel(this._banner, this._interstitial, this._rewardedVideo,
+      this._interstitialVideo, this._appOpen, this._native);
 
   factory AdsModel.fromJson(Map<String, dynamic> json) {
     if (json.isEmpty) {
@@ -67,11 +62,12 @@ class AdsModel {
       json['rewarded_video'] ?? "",
       json['interstitial_video'] ?? "",
       json['app_open'] ?? "",
+      json['native'] ?? "",
     );
   }
 
   String get banner {
-    if (kDebugMode || SimpleAdsManager.alwaysTestADs ==true) {
+    if (kDebugMode || SimpleAdsManager.alwaysTestADs == true) {
       return TestAdUnits.bannerAdUnitId;
     } else {
       if (_banner.isEmpty) {
@@ -82,7 +78,7 @@ class AdsModel {
   }
 
   String get interstitial {
-    if (kDebugMode|| SimpleAdsManager.alwaysTestADs ==true) {
+    if (kDebugMode || SimpleAdsManager.alwaysTestADs == true) {
       return TestAdUnits.interstitialAdUnitId;
     } else {
       if (_interstitial.isEmpty) {
@@ -93,7 +89,7 @@ class AdsModel {
   }
 
   String get rewardedVideo {
-    if (kDebugMode|| SimpleAdsManager.alwaysTestADs ==true) {
+    if (kDebugMode || SimpleAdsManager.alwaysTestADs == true) {
       return TestAdUnits.rewardedAdUnitId;
     } else {
       if (_rewardedVideo.isEmpty) {
@@ -104,8 +100,8 @@ class AdsModel {
   }
 
   String get interStitialVideo {
-    if (kDebugMode|| SimpleAdsManager.alwaysTestADs ==true) {
-      return TestAdUnits.rewardedAdUnitId;
+    if (kDebugMode || SimpleAdsManager.alwaysTestADs == true) {
+      return TestAdUnits.rewardedInterstitialAdUnitId;
     } else {
       if (_interstitialVideo.isEmpty) {
         throw UnsupportedError('Interstitial video ad unit id is empty');
@@ -115,13 +111,24 @@ class AdsModel {
   }
 
   String get appOpen {
-    if (kDebugMode|| SimpleAdsManager.alwaysTestADs ==true) {
+    if (kDebugMode || SimpleAdsManager.alwaysTestADs == true) {
       return TestAdUnits.appOpenAdUnitId;
     } else {
       if (_appOpen.isEmpty) {
         throw UnsupportedError('App open ad unit id is empty');
       }
       return _appOpen;
+    }
+  }
+
+  String get native {
+    if (kDebugMode || SimpleAdsManager.alwaysTestADs == true) {
+      return TestAdUnits.nativeAdUnitId;
+    } else {
+      if (_native.isEmpty) {
+        throw UnsupportedError('Native ad unit id is empty');
+      }
+      return _native;
     }
   }
 }
