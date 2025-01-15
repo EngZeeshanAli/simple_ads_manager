@@ -4,6 +4,7 @@ import 'package:flutter/widgets.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:simple_ads_manager/src/ads/banner.dart';
 import 'package:simple_ads_manager/src/ads/interstitial.dart';
+import 'package:simple_ads_manager/src/ads/native.dart';
 import 'package:simple_ads_manager/src/models/AdConfig.dart';
 import 'ads/app_open.dart';
 import 'ads/rewarded.dart';
@@ -16,13 +17,14 @@ class SimpleAdsManager {
   static bool bannerEnabled = true;
 
   static final SimpleAdsManager _instance =
-  SimpleAdsManager._privateConstructor();
+      SimpleAdsManager._privateConstructor();
 
   static SimpleAdsManager get instance => _instance;
 
-  Future<void> init({bool? appOpen = false,
-    bool interstitial = false,
-    bool rewarded = false}) async {
+  Future<void> init(
+      {bool? appOpen = false,
+      bool interstitial = false,
+      bool rewarded = false}) async {
     await MobileAds.instance.initialize();
     if (appOpen!) {
       AdmobAppOpen.loadAppOpen();
@@ -47,17 +49,29 @@ class SimpleAdsManager {
     AdConfig.setAdUnits(jsonAssetName);
   }
 
-  Widget showBanner({Function()? onLoaded }) {
+  Widget showBanner({Function()? onLoaded}) {
     return AdMobBanner(
-      bannerAdUnit: AdConfig.instance.ads.banner, onLoaded: onLoaded,);
+      bannerAdUnit: AdConfig.instance.ads.banner,
+      onLoaded: onLoaded,
+    );
+  }
+
+  Widget showNativeAd(
+      {required NativeTemplateStyle nativeTemplateStyle,
+      Function()? onLoaded}) {
+    return AdMobNative(
+      bannerAdUnit: AdConfig.instance.ads.native,
+      onLoaded: onLoaded,
+      nativeTemplateStyle: nativeTemplateStyle,
+    );
   }
 
   void showInterstitialAd(BuildContext context, Function() onDismiss) {
     AdmobInterstitial.showAd(context, onDismiss);
   }
 
-  void showRewardedAd(BuildContext context,
-      Function(RewardItem? reward) onRewarded) {
+  void showRewardedAd(
+      BuildContext context, Function(RewardItem? reward) onRewarded) {
     AdMobRewarded.show(context, onRewarded);
   }
 

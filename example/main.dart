@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:simple_ads_manager/simple_ads_manager.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await SimpleAdsManager.instance.setAdUnits("ads.json");
-  await SimpleAdsManager.instance.init(
-      appOpen: true, interstitial: true, rewarded: true);
+  await SimpleAdsManager.instance
+      .init(appOpen: true, interstitial: true, rewarded: true);
   runApp(const MyApp());
 }
 
@@ -44,10 +45,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Theme
-            .of(context)
-            .colorScheme
-            .inversePrimary,
+        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
         title: Text(widget.title),
       ),
       body: Center(
@@ -56,6 +54,37 @@ class _MyHomePageState extends State<MyHomePage> {
           children: <Widget>[
             const Text('You have pushed the button this many times:'),
             SimpleAdsManager.instance.showBanner(),
+            Container(
+              height: 90,
+              child: SimpleAdsManager.instance.showNativeAd(
+                  nativeTemplateStyle: NativeTemplateStyle(
+                      // Required: Choose a template.
+                      templateType: TemplateType.medium,
+
+                      // Optional: Customize the ad's style.
+                      mainBackgroundColor: Colors.white,
+                      cornerRadius: 10.0,
+                      callToActionTextStyle: NativeTemplateTextStyle(
+                          textColor: Colors.black,
+                          backgroundColor: Colors.red,
+                          style: NativeTemplateFontStyle.monospace,
+                          size: 16.0),
+                      primaryTextStyle: NativeTemplateTextStyle(
+                          textColor: Colors.red,
+                          backgroundColor: Colors.cyan,
+                          style: NativeTemplateFontStyle.italic,
+                          size: 16.0),
+                      secondaryTextStyle: NativeTemplateTextStyle(
+                          textColor: Colors.green,
+                          backgroundColor: Colors.black,
+                          style: NativeTemplateFontStyle.bold,
+                          size: 16.0),
+                      tertiaryTextStyle: NativeTemplateTextStyle(
+                          textColor: Colors.brown,
+                          backgroundColor: Colors.amber,
+                          style: NativeTemplateFontStyle.normal,
+                          size: 16.0))),
+            ),
             ElevatedButton(
                 onPressed: () {
                   SimpleAdsManager.instance.showInterstitialAd(context, () {

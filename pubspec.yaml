@@ -1,6 +1,6 @@
 name: simple_ads_manager
 description: An easy way to use google ads in flutter.
-version: 0.0.4
+version: 0.0.5
 license: MIT
 homepage: https://engzeeshanali.github.io/
 
@@ -11,7 +11,7 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  google_mobile_ads: ^5.1.0
+  google_mobile_ads: ^5.2.0
 
 
 

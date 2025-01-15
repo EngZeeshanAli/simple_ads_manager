@@ -63,6 +63,37 @@ SimpleAdsManager.instance.showAppOpenAd(context, () => {});
 // show app open on app resume
 SimpleAdsManager.instance.enableAutoAppOpenAdFeature(context);
 
+//must import when using NativeTemplateStyle
+import 'package:simple_ads_manager/simple_ads_manager.dart';
+SimpleAdsManager.instance.showNativeAd(
+nativeTemplateStyle: NativeTemplateStyle(
+// Required: Choose a template.
+templateType: TemplateType.medium,
+
+// Optional: Customize the ad's style.
+mainBackgroundColor: Colors.white,
+cornerRadius: 10.0,
+callToActionTextStyle: NativeTemplateTextStyle(
+textColor: Colors.black,
+backgroundColor: Colors.red,
+style: NativeTemplateFontStyle.monospace,
+size: 16.0),
+primaryTextStyle: NativeTemplateTextStyle(
+textColor: Colors.red,
+backgroundColor: Colors.cyan,
+style: NativeTemplateFontStyle.italic,
+size: 16.0),
+secondaryTextStyle: NativeTemplateTextStyle(
+textColor: Colors.green,
+backgroundColor: Colors.black,
+style: NativeTemplateFontStyle.bold,
+size: 16.0),
+tertiaryTextStyle: NativeTemplateTextStyle(
+textColor: Colors.brown,
+backgroundColor: Colors.amber,
+style: NativeTemplateFontStyle.normal,
+size: 16.0))),
+
 ```
 
 # Author
