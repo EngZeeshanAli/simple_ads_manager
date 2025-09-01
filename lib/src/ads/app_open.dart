@@ -23,8 +23,16 @@ class AdmobAppOpen {
     );
   }
 
-  static void show(BuildContext context, Function() onDismiss) {
+  static void show(BuildContext context, Function() onDismiss, { Function(Ad, double, PrecisionType, String)? onPaid }) {
     if (_appOpenAd != null) {
+      _appOpenAd?.onPaidEvent =
+          (Ad ad, double valueMicros, PrecisionType precision, String currencyCode) {
+        final revenue = valueMicros / 1000000.0;
+        final revenueString = "$revenue $currencyCode";
+        onPaid?.call(ad, valueMicros, precision, currencyCode);
+        print('AppOpenAd paid event: $revenueString');
+      };
+
       _appOpenAd!.fullScreenContentCallback = FullScreenContentCallback(
         onAdShowedFullScreenContent: (ad) {},
         onAdFailedToShowFullScreenContent: (ad, error) {

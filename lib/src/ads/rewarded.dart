@@ -18,8 +18,16 @@ class AdMobRewarded {
         ));
   }
 
-  static void show(BuildContext context,Function(RewardItem? reward) onRewarded) {
+  static void show(BuildContext context,Function(RewardItem? reward) onRewarded, { Function(Ad, double, PrecisionType, String)? onPaid }) {
     if (_rewardedAd != null) {
+      _rewardedAd?.onPaidEvent =
+          (Ad ad, double valueMicros, PrecisionType precision, String currencyCode) {
+        final revenue = valueMicros / 1000000.0;
+        final revenueString = "$revenue $currencyCode";
+        onPaid!.call(ad, valueMicros, precision, currencyCode);
+        print('RewardedAd paid event: $revenueString');
+      };
+
       RewardItem? rewardItem;
 
       _rewardedAd?.fullScreenContentCallback = FullScreenContentCallback(

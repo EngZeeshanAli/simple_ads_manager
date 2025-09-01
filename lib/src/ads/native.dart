@@ -7,12 +7,14 @@ class AdMobNative extends StatefulWidget {
   final Function()? onLoaded;
   final String bannerAdUnit;
   final NativeTemplateStyle nativeTemplateStyle;
+  final Function(Ad ad, double valueMicros, PrecisionType precision, String currencyCode)? onPaid;
+
 
   const AdMobNative(
       {super.key,
       required this.bannerAdUnit,
       required this.nativeTemplateStyle,
-      this.onLoaded});
+      this.onLoaded, this.onPaid});
 
   @override
   State<AdMobNative> createState() => _AdMobNativeState();
@@ -39,6 +41,12 @@ class _AdMobNativeState extends State<AdMobNative> {
               nativeAd = ad as NativeAd;
             });
             widget.onLoaded?.call();
+          },
+          onPaidEvent: (Ad ad, double valueMicros, PrecisionType precision, String currencyCode) {
+            final revenue = valueMicros / 1000000.0;
+            final revenueString = "$revenue $currencyCode";
+            debugPrint('NativeAd paid event: $revenueString');
+            widget.onPaid?.call(ad, valueMicros, precision, currencyCode);
           },
           onAdFailedToLoad: (ad, error) {
             // Dispose the ad here to free resources.

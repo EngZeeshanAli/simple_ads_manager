@@ -92,14 +92,26 @@ class _MyHomePageState extends State<MyHomePage> {
                 onPressed: () {
                   SimpleAdsManager.instance.showInterstitialAd(context, () {
                     // after innterstitial ad is dismissed or ad is not available
-                  });
+                  },
+                      onPaid: (ad, valueMicros, precision, currencyCode) {
+                    // when user has paid for the ad
+                        final revenue = valueMicros / 1000000.0;
+                        print("InterstitialAd paid event: $revenue $currencyCode");
+                  }
+                  );
                 },
                 child: Text("Show Interstitial")),
             ElevatedButton(
                 onPressed: () {
                   SimpleAdsManager.instance.showAppOpenAd(context, () {
                     // after ad is dismissed or ad is not available
-                  });
+                  },
+                  onPaid: (ad, valueMicros, precision, currencyCode) {
+                    // when user has paid for the ad
+                        final revenue = valueMicros / 1000000.0;
+                        print("AppOpenAd paid event: $revenue $currencyCode");
+                  }
+                  );
                 },
                 child: Text("Show App Open")),
             ElevatedButton(
@@ -107,7 +119,13 @@ class _MyHomePageState extends State<MyHomePage> {
                   SimpleAdsManager.instance.showRewardedAd(context, (reward) {
                     // after user has watched the ad
                     // if reward is null user has not watched the ad or ad is not available
-                  });
+                  },
+                      onPaid: (ad, valueMicros, precision, currencyCode) {
+                    // when user has paid for the ad
+                        final revenue = valueMicros / 1000000.0;
+                        print("RewardedAd paid event: $revenue $currencyCode");
+                  }
+                  );
                 },
                 child: Text("Show Rewarded")),
             ElevatedButton(
@@ -116,7 +134,13 @@ class _MyHomePageState extends State<MyHomePage> {
                       (reward) {
                     // after user has watched the ad
                     // if reward is null user has not watched the ad or ad is not available
-                  });
+                  },
+                    onPaid: (ad, valueMicros, precision, currencyCode) {
+                      // when user has paid for the ad
+                        final revenue = valueMicros / 1000000.0;
+                        print("RewardedInterstitialAd paid event: $revenue $currencyCode");
+                    }
+                  );
                 },
                 child: Text("Show Interstitial Rewarded")),
           ],

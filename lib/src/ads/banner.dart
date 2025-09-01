@@ -5,8 +5,9 @@ import 'package:simple_ads_manager/simple_ads_manager.dart';
 class AdMobBanner extends StatefulWidget {
   final Function()? onLoaded;
   final String bannerAdUnit;
+  final Function(Ad ad, double valueMicros, PrecisionType precision, String currencyCode)? onPaid;
 
-  const AdMobBanner({super.key, required this.bannerAdUnit, this.onLoaded});
+  const AdMobBanner({super.key, required this.bannerAdUnit, this.onLoaded, this.onPaid});
 
   @override
   State<AdMobBanner> createState() => _AdMobBannerState();
@@ -26,6 +27,12 @@ class _AdMobBannerState extends State<AdMobBanner> {
             _bannerAd = ad as BannerAd;
             widget.onLoaded?.call();
           });
+        },
+        onPaidEvent: (Ad ad, double valueMicros, PrecisionType precision, String currencyCode) {
+          final revenue = valueMicros / 1000000.0;
+          final revenueString = "$revenue $currencyCode";
+          print('BannerAd paid event: $revenueString');
+          widget.onPaid?.call(ad, valueMicros, precision, currencyCode);
         },
         onAdFailedToLoad: (ad, err) {
           ad.dispose();

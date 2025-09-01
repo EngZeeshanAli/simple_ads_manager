@@ -24,8 +24,16 @@ class AdmobRewardedInterstitial {
   }
 
   static void showAd(
-      BuildContext context, Function(RewardItem? reward) onRewarded) {
+      BuildContext context, Function(RewardItem? reward) onRewarded, { Function(Ad, double, PrecisionType, String)? onPaid }) {
     if (_rewardedInterstitialAd != null) {
+      _rewardedInterstitialAd?.onPaidEvent =
+          (Ad ad, double valueMicros, PrecisionType precision, String currencyCode) {
+        final revenue = valueMicros / 1000000.0;
+        final revenueString = "$revenue $currencyCode";
+        onPaid?.call(ad, valueMicros, precision, currencyCode);
+        print('RewardedInterstitialAd paid event: $revenueString');
+      };
+
       RewardItem? rewardItem;
 
       _rewardedInterstitialAd?.fullScreenContentCallback =

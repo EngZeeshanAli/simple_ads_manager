@@ -55,39 +55,41 @@ class SimpleAdsManager {
     AdConfig.setAdUnits(jsonAssetName);
   }
 
-  Widget showBanner({Function()? onLoaded}) {
+  Widget showBanner({Function()? onLoaded, Function(Ad, double, PrecisionType, String)? onPaid}) {
     return AdMobBanner(
       bannerAdUnit: AdConfig.instance.ads.banner,
       onLoaded: onLoaded,
+      onPaid: onPaid,
     );
   }
 
   Widget showNativeAd(
       {required NativeTemplateStyle nativeTemplateStyle,
-      Function()? onLoaded}) {
+      Function()? onLoaded, Function(Ad, double, PrecisionType, String)? onPaid}) {
     return AdMobNative(
       bannerAdUnit: AdConfig.instance.ads.native,
       onLoaded: onLoaded,
       nativeTemplateStyle: nativeTemplateStyle,
+      onPaid: onPaid,
     );
   }
 
-  void showInterstitialAd(BuildContext context, Function() onDismiss) {
-    AdmobInterstitial.showAd(context, onDismiss);
+  void showInterstitialAd(BuildContext context, Function() onDismiss, { Function(Ad, double, PrecisionType, String)? onPaid }) {
+    AdmobInterstitial.showAd(context, onDismiss, onPaid: onPaid);
   }
 
   void showRewardedAd(
-      BuildContext context, Function(RewardItem? reward) onRewarded) {
-    AdMobRewarded.show(context, onRewarded);
+      BuildContext context, Function(RewardItem? reward) onRewarded, { Function(Ad, double, PrecisionType, String)? onPaid }) {
+    AdMobRewarded.show(context, onRewarded, onPaid: onPaid);
   }
 
   void showInterstitialRewardedAd(
-      BuildContext context, Function(RewardItem? reward) onRewarded) {
-    AdmobRewardedInterstitial.showAd(context, onRewarded);
+      BuildContext context, Function(RewardItem? reward) onRewarded, { Function(Ad, double, PrecisionType, String)? onPaid }) {
+    AdmobRewardedInterstitial.showAd(context, onRewarded, onPaid: onPaid);
   }
 
-  void showAppOpenAd(BuildContext context, Function() onDismiss) {
-    AdmobAppOpen.show(context, onDismiss);
+  void showAppOpenAd(BuildContext context, Function() onDismiss, { Function(Ad, double, PrecisionType, String)? onPaid }) {
+    AdmobAppOpen.show(context, onDismiss, onPaid: onPaid);
   }
 
   void enableAutoAppOpenAdFeature(BuildContext context) {

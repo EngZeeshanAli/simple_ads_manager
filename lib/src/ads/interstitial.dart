@@ -24,9 +24,17 @@ class AdmobInterstitial {
     );
   }
 
-  static void showAd(BuildContext context, Function() onDismiss) {
+  static void showAd(BuildContext context, Function() onDismiss, { Function(Ad, double, PrecisionType, String)? onPaid }) {
 
     if (_interstitialAd != null) {
+      _interstitialAd?.onPaidEvent =
+          (Ad ad, double valueMicros, PrecisionType precision, String currencyCode) {
+        final revenue = valueMicros / 1000000.0;
+        final revenueString = "$revenue $currencyCode";
+onPaid?.call(ad, valueMicros, precision, currencyCode);
+        print('InterstitialAd paid event: $revenueString');
+      };
+
       _interstitialAd?.fullScreenContentCallback = FullScreenContentCallback(
         onAdDismissedFullScreenContent: (ad) {
           Navigator.of(context).pop();
