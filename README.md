@@ -1,103 +1,272 @@
 # ✅ simple_ads_manager
 
-# Google Mobile Ads for Flutter Using AdMob
+### Google Mobile Ads (AdMob) Made Simple for Flutter
 
-## Platform Support
+A clean, centralized, and production-ready Ads Manager for Flutter apps using **Google Mobile Ads (
+AdMob)**.
+
+---
+
+## ✅ Platform Support
 
 | Android | iOS |
 |:-------:|:---:|
 |    ✅    |  ✅  |
 
-# Usage
+---
 
-Follow the easy and fast 4 steps to use the package.
+## ✨ Features
 
-## Step 1: Add the package to your project
+- Banner Ads
+- Native Ads (Template based)
+- Interstitial Ads
+- Rewarded Ads
+- Rewarded Interstitial Ads
+- App Open Ads
+- Auto App Open (Lifecycle based)
+- Revenue callbacks
+- Clean & fluent API
+
+---
+
+## 📦 Installation
 
 ```yaml
 dependencies:
   simple_ads_manager: ^0.0.2
 ```
 
-## Step 2: Ad Units
-1. Create a json file in the assets folder [(download json file)](https://drive.usercontent.google.com/u/0/uc?id=1XSdZcvLzZ_LkH1Tp66XB6P7WhA3rDpKS&export=download)
-2. Add `<meta-data>` to the `AndroidManifest.xml` file
+## 📢 Supported Ad Formats
+
+| Ad Type               | Description                 |
+|-----------------------|-----------------------------|
+| Banner                | Standard banner ads         |
+| Native                | Template based native ads   |
+| Interstitial          | Fullscreen ads              |
+| Rewarded              | Reward based fullscreen ads |
+| Rewarded Interstitial | Fullscreen + reward         |
+| App Open              | Ads shown on app start      |
+| Auto App Open         | Ads shown on app resume     |
+
+---
+
+# 🚀 Usage
+
+Follow the steps below to integrate ads in **minutes**.
+
+---
+
+## Step 1️⃣ Add Dependency
+
+```yaml
+dependencies:
+  simple_ads_manager: ^0.0.2
+````
+
+---
+
+## Step 2️⃣ AdMob App ID Setup
+
+### Android (`AndroidManifest.xml`)
+
 ```xml
-<meta-data
-    android:name="com.google.android.gms.ads.APPLICATION_ID"
-    android:value="REPLACE_WITH_YOUR_APP_ID"/>
-```
-3. Add `GADApplicationIdentifier` to the `Info.plist` file for IOS
-```xml
-<key>GADApplicationIdentifier</key>
-<string>REPLACE_WITH_YOUR_APP_ID</string>
+
+<meta-data android:name="com.google.android.gms.ads.APPLICATION_ID"
+    android:value="REPLACE_WITH_YOUR_ANDROID_APP_ID" />
 ```
 
+### iOS (`Info.plist`)
 
-## Step 3: Initialize the plugin
+```xml
+
+<key>GADApplicationIdentifier</key><string>REPLACE_WITH_YOUR_APP_ID</string>
+```
+
+---
+
+## Step 3️⃣ Initialize Ads (Once)
 
 ```dart
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await SimpleAdsManager.instance.setAdUnits("ads.json");
-  await SimpleAdsManager.instance.init(appOpen: true, interstitial: true, rewarded: true);
+
+  await SimpleAdsManager.instance.initAdsManager(
+    // Android
+    bannerAndroid: "ca-app-pub-xxx",
+    interstitialAndroid: "ca-app-pub-xxx",
+    rewardedAndroid: "ca-app-pub-xxx",
+    rewardedInterstitialAndroid: "ca-app-pub-xxx",
+    nativeAndroid: "ca-app-pub-xxx",
+    appOpenAndroid: "ca-app-pub-xxx",
+
+    // iOS
+    bannerIOS: "ca-app-pub-xxx",
+    interstitialIOS: "ca-app-pub-xxx",
+    rewardedIOS: "ca-app-pub-xxx",
+    rewardedInterstitialIOS: "ca-app-pub-xxx",
+    nativeIOS: "ca-app-pub-xxx",
+    appOpenIOS: "ca-app-pub-xxx",
+  );
+
+  SimpleAdsManager.instance.enableAds(
+    banner: true,
+    native: true,
+    interstitial: true,
+    rewarded: true,
+    rewardedInterstitial: true,
+    appOpen: true,
+  );
+
   runApp(const MyApp());
 }
 ```
 
-## Step 4: Show Ads
+---
+
+## Step 4️⃣ Show Ads
+
+### 🟢 Banner Ad
 
 ```dart
-//show banner 
-SimpleAdsManager.instance.showBanner()
-
-//show interstitial
-SimpleAdsManager.instance.showInterstitialAd(context, () => {})
-
-//show rewarded
-SimpleAdsManager.instance.showRewardedAd(context, (reward) => {});
-
-// show app open
-SimpleAdsManager.instance.showAppOpenAd(context, () => {});
-
-// show app open on app resume
-SimpleAdsManager.instance.enableAutoAppOpenAdFeature(context);
-
-//must import when using NativeTemplateStyle
-import 'package:simple_ads_manager/simple_ads_manager.dart';
-SimpleAdsManager.instance.showNativeAd(
-nativeTemplateStyle: NativeTemplateStyle(
-// Required: Choose a template.
-templateType: TemplateType.medium,
-
-// Optional: Customize the ad's style.
-mainBackgroundColor: Colors.white,
-cornerRadius: 10.0,
-callToActionTextStyle: NativeTemplateTextStyle(
-textColor: Colors.black,
-backgroundColor: Colors.red,
-style: NativeTemplateFontStyle.monospace,
-size: 16.0),
-primaryTextStyle: NativeTemplateTextStyle(
-textColor: Colors.red,
-backgroundColor: Colors.cyan,
-style: NativeTemplateFontStyle.italic,
-size: 16.0),
-secondaryTextStyle: NativeTemplateTextStyle(
-textColor: Colors.green,
-backgroundColor: Colors.black,
-style: NativeTemplateFontStyle.bold,
-size: 16.0),
-tertiaryTextStyle: NativeTemplateTextStyle(
-textColor: Colors.brown,
-backgroundColor: Colors.amber,
-style: NativeTemplateFontStyle.normal,
-size: 16.0))),
-
+SimpleAdsManager.instance.banner
+(
+onLoaded: () {},
+onRevenue: (revenue) {},
+);
 ```
 
-# Author
+---
 
-[<img src="https://scontent.flhe5-1.fna.fbcdn.net/v/t39.30808-6/300559864_1436774140119711_6792763069085736620_n.jpg?_nc_cat=103&ccb=1-7&_nc_sid=a5f93a&_nc_eui2=AeEsk-GblO_jJANgp-_UhJaNgEfEczKricGAR8RzMquJwW2u-H-TgOSLeqFm2gSOududzskIX_jdxREko_2yBI8k&_nc_ohc=Je8MFXkbW-8Q7kNvgFUBu93&_nc_pt=1&_nc_ht=scontent.flhe5-1.fna&oh=00_AYDsSi9PKkNf83SyTNXvS68FXdZb1lSdh6b_nbQnY54pJw&oe=669EEF49" width="250"/>](image.png)
-## Eng. Zeeshan Ali
+### 🟢 Interstitial Ad
 
+```dart
+SimpleAdsManager.instance.interstitial
+(
+context: context,
+onDismiss: (adShown) {},
+onRevenue: (revenue) {},
+);
+```
+
+---
+
+### 🟢 Rewarded Ad
+
+```dart
+SimpleAdsManager.instance.rewarded
+(
+context: context,
+onRewarded: (reward, adShown) {},
+onRevenue: (revenue) {},
+);
+```
+
+---
+
+### 🟢 Rewarded Interstitial Ad
+
+```dart
+SimpleAdsManager.instance.rewardedInterstitial
+(
+context: context,
+onRewarded: (reward, adShown) {},
+onRevenue: (revenue) {},
+);
+```
+
+---
+
+### 🟢 App Open Ad
+
+```dart
+SimpleAdsManager.instance.appOpen
+(
+context: context,
+onDismiss: (adShown) {},
+onRevenue: (revenue) {},
+);
+```
+
+---
+
+### 🟢 Auto App Open (Recommended)
+
+Automatically shows App Open ads when app resumes.
+
+```dart
+SimpleAdsManager.instance.autoAppOpen
+(
+context: context,
+onDismiss: (adShown) {},
+onRevenue: (revenue) {},
+);
+```
+
+---
+
+### 🟢 Native Ad
+
+```dart
+import 'package:simple_ads_manager/simple_ads_manager.dart';
+
+SimpleAdsManager.instance.native
+(
+nativeTemplateStyle: NativeTemplateStyle(
+templateType: TemplateType.medium,
+mainBackgroundColor: Colors.white,
+cornerRadius: 10,
+callToActionTextStyle: NativeTemplateTextStyle(
+textColor: Colors.white,
+backgroundColor: Colors.blue,
+size: 16,
+),
+primaryTextStyle: NativeTemplateTextStyle(
+textColor: Colors.black,
+size: 14,
+),
+secondaryTextStyle: NativeTemplateTextStyle(
+textColor: Colors.grey,
+size: 12,
+),
+),
+onLoaded: () {},
+onRevenue: (revenue) {},
+);
+```
+
+---
+
+## 🔍 Check Ad Availability
+
+```dart
+
+bool ready =
+SimpleAdsManager.instance.isAvailable(AdType.interstitial);
+```
+
+---
+
+## ⚠️ Best Practices
+
+* Initialize ads before usage
+* Use test ads during development
+* Avoid showing ads back-to-back
+* Always check availability
+* Follow AdMob policies
+
+---
+
+## 👨‍💻 Author
+
+**Eng. Zeeshan Ali**  
+Senior Software Engineer  
+Flutter • Android • iOS  
+Google Mobile Ads Specialist
+
+---
+
+## 📄 License
+
+MIT License © 2025 Zeeshan Ali
+
+```
