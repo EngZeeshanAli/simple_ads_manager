@@ -79,7 +79,7 @@ dependencies:
 
 ```xml
 
-<key>GADApplicationIdentifier</key><string>REPLACE_WITH_YOUR_APP_ID</string>
+<key>GADApplicationIdentifier</key><string>SAMPLE_APP_ID</string>
 ```
 
 ---
