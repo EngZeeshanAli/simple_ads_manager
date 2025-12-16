@@ -1,5 +1,7 @@
 import 'dart:io';
 
+import 'ad_type.dart';
+
 class TestAdUnits {
   static String get bannerAdUnitId {
     if (Platform.isAndroid) {
@@ -61,6 +63,22 @@ class TestAdUnits {
     }
   }
 
-
-
+  static String getAdTestUnit(String type) {
+    switch (type) {
+      case AdType.banner:
+        return bannerAdUnitId;
+      case AdType.interstitial:
+        return interstitialAdUnitId;
+      case AdType.rewarded:
+        return rewardedAdUnitId;
+      case AdType.rewardedInterstitial:
+        return rewardedInterstitialAdUnitId;
+      case AdType.appOpen:
+        return appOpenAdUnitId;
+      case AdType.native:
+        return nativeAdUnitId;
+      default:
+        throw UnsupportedError("Unsupported ad unit type");
+    }
+  }
 }

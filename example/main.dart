@@ -4,129 +4,159 @@ import 'package:simple_ads_manager/simple_ads_manager.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await SimpleAdsManager.instance.setAdUnits("ads.json");
-  await SimpleAdsManager.instance.init(
-      appOpen: true,
-      interstitial: true,
-      rewarded: true,
-      rewardedInterstitial: true);
+
+  // Initialize ads manager
+  await SimpleAdsManager.instance.initAdsManager(
+    bannerAndroid: "YOUR_BANNER_ANDROID",
+    interstitialAndroid: "YOUR_INTERSTITIAL_ANDROID",
+    rewardedAndroid: "YOUR_REWARDED_ANDROID",
+    rewardedInterstitialAndroid: "YOUR_REWARDED_INTERSTITIAL_ANDROID",
+    nativeAndroid: "YOUR_NATIVE_ANDROID",
+    appOpenAndroid: "YOUR_APP_OPEN_ANDROID",
+    bannerIOS: "YOUR_BANNER_IOS",
+    interstitialIOS: "YOUR_INTERSTITIAL_IOS",
+    rewardedIOS: "YOUR_REWARDED_IOS",
+    rewardedInterstitialIOS: "YOUR_REWARDED_INTERSTITIAL_IOS",
+    nativeIOS: "YOUR_NATIVE_IOS",
+    appOpenIOS: "YOUR_APP_OPEN_IOS",
+  );
+
+  // Enable the ads you want
+  SimpleAdsManager.instance.enableAds(
+    banner: true,
+    native: true,
+    interstitial: true,
+    rewarded: true,
+    rewardedInterstitial: true,
+    appOpen: true,
+  );
+
   runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    SimpleAdsManager.instance.enableAutoAppOpenAdFeature(context);
+    // Enable automatic app open ads on resume
+    SimpleAdsManager.instance.autoAppOpen(context: context);
+
     return MaterialApp(
-      title: 'Flutter Demo',
+      title: 'Flutter Ads Demo',
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
-      home: const MyHomePage(title: 'Flutter Demo Home Page'),
+      home: const HomePage(),
     );
   }
 }
 
-class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key, required this.title});
+class HomePage extends StatelessWidget {
+  const HomePage({super.key});
 
-  final String title;
-
-  @override
-  State<MyHomePage> createState() => _MyHomePageState();
-}
-
-class _MyHomePageState extends State<MyHomePage> {
   @override
   Widget build(BuildContext context) {
-    //when ever the app is resumed the app open ad will be shown
-    SimpleAdsManager.instance.enableAutoAppOpenAdFeature(context);
-
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        title: Text(widget.title),
+        title: const Text("Flutter Ads Demo"),
       ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            const Text('You have pushed the button this many times:'),
-            SimpleAdsManager.instance.showBanner(),
-            Container(
-              height: 90,
-              child: SimpleAdsManager.instance.showNativeAd(
-                  nativeTemplateStyle: NativeTemplateStyle(
-                      // Required: Choose a template.
-                      templateType: TemplateType.medium,
+      body: SingleChildScrollView(
+        child: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const SizedBox(height: 10),
+              const Text("Banner Ad:"),
+              // Show Banner Ad
+              SimpleAdsManager.instance.banner(),
 
-                      // Optional: Customize the ad's style.
-                      mainBackgroundColor: Colors.white,
-                      cornerRadius: 10.0,
-                      callToActionTextStyle: NativeTemplateTextStyle(
-                          textColor: Colors.black,
-                          backgroundColor: Colors.red,
-                          style: NativeTemplateFontStyle.monospace,
-                          size: 16.0),
-                      primaryTextStyle: NativeTemplateTextStyle(
-                          textColor: Colors.red,
-                          backgroundColor: Colors.cyan,
-                          style: NativeTemplateFontStyle.italic,
-                          size: 16.0),
-                      secondaryTextStyle: NativeTemplateTextStyle(
-                          textColor: Colors.green,
-                          backgroundColor: Colors.black,
-                          style: NativeTemplateFontStyle.bold,
-                          size: 16.0),
-                      tertiaryTextStyle: NativeTemplateTextStyle(
-                          textColor: Colors.brown,
-                          backgroundColor: Colors.amber,
-                          style: NativeTemplateFontStyle.normal,
-                          size: 16.0))),
-            ),
-            ElevatedButton(
+              const SizedBox(height: 20),
+              const Text("Native Ad:"),
+              Container(
+                height: 120,
+                child: SimpleAdsManager.instance.native(
+                  nativeTemplateStyle: NativeTemplateStyle(
+                    templateType: TemplateType.medium,
+                    mainBackgroundColor: Colors.white,
+                    cornerRadius: 10.0,
+                    callToActionTextStyle: NativeTemplateTextStyle(
+                      textColor: Colors.white,
+                      backgroundColor: Colors.blue,
+                      size: 16.0,
+                      style: NativeTemplateFontStyle.bold,
+                    ),
+                    primaryTextStyle: NativeTemplateTextStyle(
+                      textColor: Colors.black,
+                      size: 16.0,
+                    ),
+                    secondaryTextStyle: NativeTemplateTextStyle(
+                      textColor: Colors.grey,
+                      size: 14.0,
+                    ),
+                  ),
+                ),
+              ),
+
+              const SizedBox(height: 20),
+              ElevatedButton(
                 onPressed: () {
-                  SimpleAdsManager.instance.showInterstitialAd(context, () {
-                    // after innterstitial ad is dismissed or ad is not available
-                  });
+                  // Show Interstitial Ad
+                  SimpleAdsManager.instance.interstitial(
+                    context: context,
+                    onDismiss: (adShown) {
+                      debugPrint("Interstitial Ad Dismissed: $adShown");
+                    },
+                  );
                 },
-                child: Text("Show Interstitial")),
-            ElevatedButton(
+                child: const Text("Show Interstitial Ad"),
+              ),
+
+              ElevatedButton(
                 onPressed: () {
-                  SimpleAdsManager.instance.showAppOpenAd(context, () {
-                    // after ad is dismissed or ad is not available
-                  });
+                  // Show Rewarded Ad
+                  SimpleAdsManager.instance.rewarded(
+                    context: context,
+                    onRewarded: (reward, adShown) {
+                      debugPrint(
+                          "Rewarded Ad Completed: $adShown, Reward: ${reward?.amount ?? 0}");
+                    },
+                  );
                 },
-                child: Text("Show App Open")),
-            ElevatedButton(
+                child: const Text("Show Rewarded Ad"),
+              ),
+
+              ElevatedButton(
                 onPressed: () {
-                  SimpleAdsManager.instance.showRewardedAd(context, (reward) {
-                    // after user has watched the ad
-                    // if reward is null user has not watched the ad or ad is not available
-                  });
+                  // Show Rewarded Interstitial Ad
+                  SimpleAdsManager.instance.rewardedInterstitial(
+                    context: context,
+                    onRewarded: (reward, adShown) {
+                      debugPrint(
+                          "Rewarded Interstitial Completed: $adShown, Reward: ${reward?.amount ?? 0}");
+                    },
+                  );
                 },
-                child: Text("Show Rewarded")),
-            ElevatedButton(
+                child: const Text("Show Rewarded Interstitial Ad"),
+              ),
+
+              ElevatedButton(
                 onPressed: () {
-                  SimpleAdsManager.instance.showInterstitialRewardedAd(context,
-                      (reward) {
-                    // after user has watched the ad
-                    // if reward is null user has not watched the ad or ad is not available
-                  });
+                  // Show App Open Ad manually
+                  SimpleAdsManager.instance.appOpen(
+                    context: context,
+                    onDismiss: (adShown) {
+                      debugPrint("App Open Ad Dismissed: $adShown");
+                    },
+                  );
                 },
-                child: Text("Show Interstitial Rewarded")),
-          ],
+                child: const Text("Show App Open Ad"),
+              ),
+            ],
+          ),
         ),
       ),
     );
-  }
-
-  @override
-  void dispose() {
-    super.dispose();
   }
 }

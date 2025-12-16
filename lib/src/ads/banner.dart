@@ -1,60 +1,69 @@
+import 'dart:async';
 import 'package:flutter/cupertino.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
-import 'package:simple_ads_manager/simple_ads_manager.dart';
+import 'package:simple_ads_manager/src/models/AdConfig.dart';
 
-class AdMobBanner extends StatefulWidget {
+class AdMobBanner extends StatelessWidget {
   final Function()? onLoaded;
-  final String bannerAdUnit;
+  final Function(double revenue)? onRevenue;
 
-  const AdMobBanner({super.key, required this.bannerAdUnit, this.onLoaded});
+  const AdMobBanner({super.key, this.onLoaded, this.onRevenue});
 
-  @override
-  State<AdMobBanner> createState() => _AdMobBannerState();
-}
+  Future<BannerAd?> _loadBanner() async {
+    if (!AdConfig.enableBanner) {
+      debugPrint('⚠️ Banner ads are disabled.');
+      return null;
+    }
 
-class _AdMobBannerState extends State<AdMobBanner> {
-  BannerAd? _bannerAd;
+    final completer = Completer<BannerAd>();
 
-  void _createBanner() {
-    BannerAd(
-      adUnitId: widget.bannerAdUnit,
-      request: const AdRequest(),
+    final ad = BannerAd(
+      adUnitId: AdConfig.getBanner(),
       size: AdSize.banner,
+      request: const AdRequest(),
       listener: BannerAdListener(
         onAdLoaded: (ad) {
-          setState(() {
-            _bannerAd = ad as BannerAd;
-            widget.onLoaded?.call();
-          });
+          // Call onLoaded
+          onLoaded?.call();
+          debugPrint('✅ BannerAd loaded.');
+          completer.complete(ad as BannerAd);
         },
-        onAdFailedToLoad: (ad, err) {
+        onAdFailedToLoad: (ad, error) {
           ad.dispose();
+          debugPrint('❌ BannerAd failed to load: $error');
+          completer.complete(null);
+        },
+        onPaidEvent: (ad, valueMicros, precision, currencyCode) {
+          double revenue =
+              valueMicros / 1000000; // convert micros to currency units
+          debugPrint('💰 Banner revenue: $revenue $currencyCode');
+          onRevenue?.call(revenue);
         },
       ),
-    ).load();
-  }
+    );
 
-  @override
-  void initState() {
-    _createBanner();
-    super.initState();
-  }
-
-  @override
-  void dispose() {
-    _bannerAd?.dispose();
-
-    super.dispose();
+    ad.load();
+    return completer.future;
   }
 
   @override
   Widget build(BuildContext context) {
-    return _bannerAd != null && SimpleAdsManager.bannerEnabled == true
-        ? Container(
-            width: _bannerAd?.size.width.toDouble(),
-            height: _bannerAd?.size.height.toDouble(),
-            child: AdWidget(ad: _bannerAd!),
-          )
-        : Container();
+    if (!AdConfig.enableBanner) return Container();
+
+    return FutureBuilder<BannerAd?>(
+      future: _loadBanner(),
+      builder: (context, snapshot) {
+        if (snapshot.hasData && snapshot.data != null) {
+          final banner = snapshot.data!;
+          return Container(
+            width: banner.size.width.toDouble(),
+            height: banner.size.height.toDouble(),
+            child: AdWidget(ad: banner),
+          );
+        } else {
+          return SizedBox.shrink();
+        }
+      },
+    );
   }
 }

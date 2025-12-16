@@ -1,53 +1,75 @@
+import 'dart:nativewrappers/_internal/vm/lib/ffi_allocation_patch.dart';
+
 import 'package:flutter/material.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
+import 'package:simple_ads_manager/src/utils/simple_overlay.dart';
 import '../models/AdConfig.dart';
-import 'blank_screen.dart';
 
 class AdmobRewardedInterstitial {
-  static RewardedInterstitialAd? _rewardedInterstitialAd;
-  static bool showingAd = false;
+  static RewardedInterstitialAd? rewardedInterstitialAd;
 
   static void loadRewardedInterstitialAd() {
+    if (!AdConfig.enableRewarded) {
+      debugPrint('⚠️ RewardedInterstitial ads are disabled.');
+      return;
+    }
     RewardedInterstitialAd.load(
-      adUnitId: AdConfig.instance.ads.interStitialVideo,
+      adUnitId: AdConfig.getRewardedInterstitial(),
       request: const AdRequest(),
       rewardedInterstitialAdLoadCallback: RewardedInterstitialAdLoadCallback(
         onAdLoaded: (ad) {
-          _rewardedInterstitialAd = ad;
+          debugPrint('✅ RewardedInterstitial Ad loaded');
+          rewardedInterstitialAd = ad;
         },
         onAdFailedToLoad: (err) {
-          print('Failed to load an rewardedInterstitial ad: ${err.message}');
-          _rewardedInterstitialAd = null;
+          debugPrint(
+              '❌ Failed to load RewardedInterstitial Ad: ${err.message}');
+          rewardedInterstitialAd = null;
         },
       ),
     );
   }
 
-  static void showAd(
-      BuildContext context, Function(RewardItem? reward) onRewarded) {
-    if (_rewardedInterstitialAd != null) {
+  static void showAd({
+    required BuildContext context,
+    Function(RewardItem? reward, bool adShown)? onRewarded,
+    Function(double revenue)? onRevenue,
+  }) {
+    if (rewardedInterstitialAd != null) {
       RewardItem? rewardItem;
 
-      _rewardedInterstitialAd?.fullScreenContentCallback =
+      rewardedInterstitialAd?.fullScreenContentCallback =
           FullScreenContentCallback(
         onAdDismissedFullScreenContent: (ad) {
-          Navigator.of(context).pop();
+          SimpleOverlay.dismiss();
           ad.dispose();
-          _rewardedInterstitialAd = null;
-          onRewarded(rewardItem);
-          loadRewardedInterstitialAd();
+          rewardedInterstitialAd = null;
+          debugPrint('⚠️ RewardedInterstitial Ad dismissed');
+          onRewarded?.call(rewardItem, true);
+          loadRewardedInterstitialAd(); // reload for next time
+        },
+        onAdImpression: (ad) {
+          debugPrint('✅ RewardedInterstitial ad impression occurred.');
         },
       );
 
-      Navigator.of(context)
-          .push(MaterialPageRoute(builder: (context) => BlankScreen()));
-      _rewardedInterstitialAd?.show(
-          onUserEarnedReward: (AdWithoutView ad, RewardItem reward) {
-        rewardItem = reward;
-      });
+      rewardedInterstitialAd?.onPaidEvent =
+          (ad, valueMicros, precision, currencyCode) {
+        double revenue = valueMicros / 1e6;
+        debugPrint('💰 RewardedInterstitial revenue: $revenue $currencyCode');
+        onRevenue?.call(revenue);
+      };
+
+      SimpleOverlay.show(context);
+      rewardedInterstitialAd?.show(
+        onUserEarnedReward: (AdWithoutView ad, RewardItem reward) {
+          rewardItem = reward;
+        },
+      );
     } else {
-      AdmobRewardedInterstitial.loadRewardedInterstitialAd();
-      onRewarded(null);
+      debugPrint('⚠️ RewardedInterstitial Ad not loaded yet, loading now.');
+      loadRewardedInterstitialAd();
+      onRewarded?.call(null, false);
     }
   }
 }
