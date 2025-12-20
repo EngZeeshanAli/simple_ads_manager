@@ -7,7 +7,7 @@ class AdmobInterstitial {
   static InterstitialAd? interstitialAd;
 
   static void loadInterstitialAd() {
-    if (AdConfig.enableInterstitial) {
+    if (!AdConfig.enableInterstitial) {
       debugPrint('⚠️ Interstitial ads are disabled.');
       return;
     }
