@@ -1,6 +1,7 @@
 import 'dart:io';
 
-import 'ad_type.dart';
+import '../../simple_ads_manager.dart';
+
 
 class TestAdUnits {
   static String get bannerAdUnitId {

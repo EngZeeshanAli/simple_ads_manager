@@ -1,13 +1,13 @@
 import 'package:flutter/widgets.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
+
+import 'package:simple_ads_manager/src/ads/app_open.dart';
 import 'package:simple_ads_manager/src/ads/banner.dart';
 import 'package:simple_ads_manager/src/ads/interstitial.dart';
+import 'package:simple_ads_manager/src/ads/interstitial_rewarded.dart';
 import 'package:simple_ads_manager/src/ads/native.dart';
-import 'package:simple_ads_manager/src/models/AdConfig.dart';
+import 'package:simple_ads_manager/src/ads/rewarded.dart';
 import 'package:simple_ads_manager/src/models/ad_type.dart';
-import 'ads/app_open.dart';
-import 'ads/interstitial_rewarded.dart';
-import 'ads/rewarded.dart';
 
 class SimpleAdsManager {
   SimpleAdsManager._private();
@@ -15,161 +15,251 @@ class SimpleAdsManager {
   static final SimpleAdsManager _instance = SimpleAdsManager._private();
 
   static SimpleAdsManager get instance => _instance;
+
+  /// Force test ads even outside debug mode.
   static bool alwaysTestADs = false;
 
-  /// Initialize all ad unit IDs for Android & iOS
-  Future<void> initAdsManager({
-    // Android
-    String? bannerAndroid,
-    String? interstitialAndroid,
-    String? rewardedAndroid,
-    String? rewardedInterstitialAndroid,
-    String? nativeAndroid,
-    String? appOpenAndroid,
-
-    // iOS
-    String? bannerIOS,
-    String? interstitialIOS,
-    String? rewardedIOS,
-    String? rewardedInterstitialIOS,
-    String? nativeIOS,
-    String? appOpenIOS,
-  }) async {
+  /// Initialize Google Mobile Ads SDK.
+  Future<void> init() async {
     await MobileAds.instance.initialize();
-    AdConfig.setAdUnits(
-      bannerAndroidId: bannerAndroid,
-      interstitialAndroidId: interstitialAndroid,
-      rewardedAndroidId: rewardedAndroid,
-      rewardedInterstitialAndroidId: rewardedInterstitialAndroid,
-      nativeAndroidId: nativeAndroid,
-      appOpenAndroidId: appOpenAndroid,
-      bannerIOSId: bannerIOS,
-      interstitialIOSId: interstitialIOS,
-      rewardedIOSId: rewardedIOS,
-      rewardedInterstitialIOSId: rewardedInterstitialIOS,
-      nativeIOSId: nativeIOS,
-      appOpenIOSId: appOpenIOS,
+  }
+
+  // ---------------------------------------------------------------------------
+  // Banner Ads
+  // ---------------------------------------------------------------------------
+
+  /// Returns a banner ad widget.
+  Widget banner({
+    required String adUnitId,
+    AdSize? adSize,
+    Widget? loadingWidget,
+    Widget? errorWidget,
+    VoidCallback? onLoaded,
+    Function(String error)? onFailed,
+    Function(double revenue)? onRevenue,
+  }) {
+    return AdMobBanner(
+      adUnitId: adUnitId,
+      adSize: adSize,
+      loadingWidget: loadingWidget,
+      errorWidget: errorWidget,
+      onLoaded: onLoaded,
+      onFailed: onFailed,
+      onRevenue: onRevenue,
     );
   }
 
-  /// Enable or disable ads globally
-  void enableAds({
-    bool banner = false,
-    bool native = false,
-    bool appOpen = false,
-    bool interstitial = false,
-    bool rewarded = false,
-    bool rewardedInterstitial = false,
-  }) {
-    AdConfig.enableBanner = banner;
-    AdConfig.enableNative = native;
-    AdConfig.enableAppOpen = appOpen;
-    AdConfig.enableInterstitial = interstitial;
-    AdConfig.enableRewarded = rewarded;
-    AdConfig.enableRewardedInterstitial = rewardedInterstitial;
+  // ---------------------------------------------------------------------------
+  // Native Ads
+  // ---------------------------------------------------------------------------
 
-    interstitial ? AdmobInterstitial.loadInterstitialAd() : null;
-    rewarded ? AdMobRewarded.loadRewardedAd() : null;
-    appOpen ? AdmobAppOpen.loadAppOpen() : null;
-    rewardedInterstitial
-        ? AdmobRewardedInterstitial.loadRewardedInterstitialAd()
-        : null;
-  }
-
-  /// Show a Banner Ad
-  Widget banner({Function()? onLoaded, Function(double revenue)? onRevenue}) {
-    return AdMobBanner(onLoaded: onLoaded);
-  }
-
-  /// Show a Native Ad
-  Widget native({
-    required NativeTemplateStyle nativeTemplateStyle,
-    Function()? onLoaded,
+  /// Returns a native ad widget.
+  Widget nativeAd({
+    required String adUnitId,
+    NativeTemplateStyle? nativeTemplateStyle,
+    double? height,
+    Widget? loadingWidget,
+    Widget? errorWidget,
+    VoidCallback? onLoaded,
+    Function(String error)? onFailed,
     Function(double revenue)? onRevenue,
   }) {
     return AdMobNative(
-      style: nativeTemplateStyle,
+      adUnitId: adUnitId,
+      nativeTemplateStyle: nativeTemplateStyle,
+      height: height,
+      loadingWidget: loadingWidget,
+      errorWidget: errorWidget,
       onLoaded: onLoaded,
+      onFailed: onFailed,
       onRevenue: onRevenue,
     );
   }
 
-  /// Show an App Open Ad
-  void appOpen({
+  // ---------------------------------------------------------------------------
+  // App Open Ads
+  // ---------------------------------------------------------------------------
+
+  /// Sets cooldown duration for app open ads.
+  void setAppOpenCooldown(int seconds) {
+    AdmobAppOpen.cooldown = Duration(seconds: seconds);
+  }
+
+  /// Loads and immediately shows an app open ad.
+  void loadAndShowAppOpen({
+    required String adUnitId,
     required BuildContext context,
-    Function(bool adShown)? onDismiss,
+    Function()? onShown,
+    Function()? onDismissed,
+    Function(String error)? onFailed,
     Function(double revenue)? onRevenue,
   }) {
-    AdmobAppOpen.show(
+    AdmobAppOpen.loadAndShow(
+      adUnitId: adUnitId,
       context: context,
-      onDismiss: onDismiss,
+      onShown: onShown,
+      onDismissed: onDismissed,
+      onFailed: onFailed,
       onRevenue: onRevenue,
     );
   }
 
-  /// Enable automatic App Open Ads on app lifecycle changes
-  void autoAppOpen({
+  /// Automatically shows app open ad when app returns to foreground.
+  void showAppStateAppOpen({
+    required String adUnitId,
     required BuildContext context,
-    Function(bool adShown)? onDismiss,
+    Function()? onShown,
+    Function()? onDismissed,
+    Function(String error)? onFailed,
     Function(double revenue)? onRevenue,
   }) {
     AppLifecycleReactorForAppOpen().listenToAppStateChanges(
+      adUnitId: adUnitId,
       context: context,
+      onShown: onShown,
+      onDismissed: onDismissed,
+      onFailed: onFailed,
+      onRevenue: onRevenue,
+    );
+  }
+
+  // ---------------------------------------------------------------------------
+  // Interstitial Ads
+  // ---------------------------------------------------------------------------
+
+  /// Loads and immediately shows an interstitial ad.
+  void loadAndShowInterstitial({
+    required String adUnitId,
+    required BuildContext context,
+    Function()? onShown,
+    Function()? onDismissed,
+    Function(String error)? onFailed,
+    Function(double revenue)? onRevenue,
+  }) {
+    AdmobInterstitial.loadAndShow(
+      adUnitId: adUnitId,
+      context: context,
+      onShown: onShown,
+      onDismissed: onDismissed,
+      onFailed: onFailed,
+      onRevenue: onRevenue,
+    );
+  }
+
+  /// Preloads an interstitial ad for later use.
+  void preloadInterstitial({
+    required String adUnitId,
+  }) {
+    AdmobInterstitial.preload(adUnitId);
+  }
+
+  /// Shows a previously preloaded interstitial ad.
+  void showPreloadedInterstitial({
+    required BuildContext context,
+    required String adUnitId,
+    required Function(bool shown) onDismiss,
+    Function(double revenue)? onRevenue,
+  }) {
+    AdmobInterstitial.showPreloaded(
+      context: context,
+      adUnitId: adUnitId,
       onDismiss: onDismiss,
       onRevenue: onRevenue,
     );
   }
 
-  /// Show an Interstitial Ad
-  void interstitial({
+  /// Returns true if a preloaded interstitial ad is ready.
+  bool get isInterstitialReady => AdmobInterstitial.isReady;
+
+  // ---------------------------------------------------------------------------
+  // Rewarded Ads
+  // ---------------------------------------------------------------------------
+
+  /// Loads and immediately shows a rewarded ad.
+  void loadAndShowRewarded({
+    required String adUnitId,
     required BuildContext context,
-    required Function(bool adShown) onDismiss,
+    Function()? onShown,
+    Function(RewardItem? reward, bool rewardEarned)? onCompleted,
+    Function(String error)? onFailed,
     Function(double revenue)? onRevenue,
   }) {
-    AdmobInterstitial.showAd(
+    AdMobRewarded.loadAndShow(
+      adUnitId: adUnitId,
       context: context,
-      onDismiss: onDismiss,
+      onShown: onShown,
+      onCompleted: onCompleted,
+      onFailed: onFailed,
       onRevenue: onRevenue,
     );
   }
 
-  /// Show a Rewarded Ad
-  void rewarded({
+  // ---------------------------------------------------------------------------
+  // Rewarded Interstitial Ads
+  // ---------------------------------------------------------------------------
+
+  /// Loads and immediately shows a rewarded interstitial ad.
+  void loadAndShowRewardedInterstitial({
+    required String adUnitId,
     required BuildContext context,
-    Function(RewardItem? reward, bool adShown)? onRewarded,
+    Function()? onShown,
+    Function(RewardItem? reward, bool rewardEarned)? onDismissed,
+    Function(String error)? onFailed,
     Function(double revenue)? onRevenue,
   }) {
-    AdMobRewarded.show(
+    AdmobRewardedInterstitial.loadAndShow(
+      adUnitId: adUnitId,
       context: context,
-      onRewarded: onRewarded,
+      onShown: onShown,
+      onDismissed: onDismissed,
+      onFailed: onFailed,
       onRevenue: onRevenue,
     );
   }
 
-  /// Show a Rewarded Interstitial Ad
-  void rewardedInterstitial({
+  /// Preloads a rewarded interstitial ad.
+  void preloadRewardedInterstitial({
+    required String adUnitId,
+  }) {
+    AdmobRewardedInterstitial.preload(adUnitId);
+  }
+
+  /// Shows a previously preloaded rewarded interstitial ad.
+  void showPreloadedRewardedInterstitial({
     required BuildContext context,
-    Function(RewardItem? reward, bool adShown)? onRewarded,
+    required String adUnitId,
+    Function()? onShown,
+    Function(RewardItem? reward, bool rewardEarned)? onDismissed,
+    Function(String error)? onFailed,
     Function(double revenue)? onRevenue,
   }) {
-    AdmobRewardedInterstitial.showAd(
+    AdmobRewardedInterstitial.showPreloaded(
       context: context,
-      onRewarded: onRewarded,
+      adUnitId: adUnitId,
+      onShown: onShown,
+      onDismissed: onDismissed,
+      onFailed: onFailed,
       onRevenue: onRevenue,
     );
   }
 
-  /// Check if a specific ad type is available
+  // ---------------------------------------------------------------------------
+  // Generic Availability
+  // ---------------------------------------------------------------------------
+
+  /// Checks whether a preloaded ad is available for the given type.
+  ///
+  /// Note:
+  /// - Banner and Native are widget-based, so this check is only meaningful for
+  ///   full-screen ad formats.
   bool isAvailable(String adType) {
     switch (adType) {
-      case AdType.appOpen:
-        return AdmobAppOpen.appOpenAd != null;
       case AdType.interstitial:
-        return AdmobInterstitial.interstitialAd != null;
-      case AdType.rewarded:
-        return AdMobRewarded.rewardedAd != null;
+        return AdmobInterstitial.isReady;
+      // case AdType.rewarded:
+      //   return AdMobRewarded.isReady;
       case AdType.rewardedInterstitial:
-        return AdmobRewardedInterstitial.rewardedInterstitialAd != null;
+        return AdmobRewardedInterstitial.isReady;
       default:
         return false;
     }

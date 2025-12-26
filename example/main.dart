@@ -4,33 +4,7 @@ import 'package:simple_ads_manager/simple_ads_manager.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-
-  // Initialize ads manager
-  await SimpleAdsManager.instance.initAdsManager(
-    bannerAndroid: "YOUR_BANNER_ANDROID",
-    interstitialAndroid: "YOUR_INTERSTITIAL_ANDROID",
-    rewardedAndroid: "YOUR_REWARDED_ANDROID",
-    rewardedInterstitialAndroid: "YOUR_REWARDED_INTERSTITIAL_ANDROID",
-    nativeAndroid: "YOUR_NATIVE_ANDROID",
-    appOpenAndroid: "YOUR_APP_OPEN_ANDROID",
-    bannerIOS: "YOUR_BANNER_IOS",
-    interstitialIOS: "YOUR_INTERSTITIAL_IOS",
-    rewardedIOS: "YOUR_REWARDED_IOS",
-    rewardedInterstitialIOS: "YOUR_REWARDED_INTERSTITIAL_IOS",
-    nativeIOS: "YOUR_NATIVE_IOS",
-    appOpenIOS: "YOUR_APP_OPEN_IOS",
-  );
-
-  // Enable the ads you want
-  SimpleAdsManager.instance.enableAds(
-    banner: true,
-    native: true,
-    interstitial: true,
-    rewarded: true,
-    rewardedInterstitial: true,
-    appOpen: true,
-  );
-
+  await SimpleAdsManager.instance.init();
   runApp(const MyApp());
 }
 
@@ -39,9 +13,6 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Enable automatic app open ads on resume
-    SimpleAdsManager.instance.autoAppOpen(context: context);
-
     return MaterialApp(
       title: 'Flutter Ads Demo',
       theme: ThemeData(
@@ -53,8 +24,36 @@ class MyApp extends StatelessWidget {
   }
 }
 
-class HomePage extends StatelessWidget {
+class HomePage extends StatefulWidget {
   const HomePage({super.key});
+
+  @override
+  State<HomePage> createState() => _HomePageState();
+}
+
+class _HomePageState extends State<HomePage> {
+  final String bannerAdUnitId = 'ca-app-pub-xxxxxxxxxxxxxxxx/banner-id';
+  final String nativeAdUnitId = 'ca-app-pub-xxxxxxxxxxxxxxxx/native-id';
+  final String interstitialAdUnitId =
+      'ca-app-pub-xxxxxxxxxxxxxxxx/interstitial-id';
+  final String rewardedAdUnitId = 'ca-app-pub-xxxxxxxxxxxxxxxx/rewarded-id';
+  final String rewardedInterstitialAdUnitId =
+      'ca-app-pub-xxxxxxxxxxxxxxxx/rewarded-interstitial-id';
+  final String appOpenAdUnitId = 'ca-app-pub-xxxxxxxxxxxxxxxx/app-open-id';
+
+  @override
+  void initState() {
+    super.initState();
+
+    // Preload fullscreen ads if you want better UX
+    SimpleAdsManager.instance.preloadInterstitial(
+      adUnitId: interstitialAdUnitId,
+    );
+
+    SimpleAdsManager.instance.preloadRewardedInterstitial(
+      adUnitId: rewardedInterstitialAdUnitId,
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -65,48 +64,78 @@ class HomePage extends StatelessWidget {
       body: SingleChildScrollView(
         child: Center(
           child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              const SizedBox(height: 10),
-              const Text("Banner Ad:"),
-              // Show Banner Ad
-              SimpleAdsManager.instance.banner(),
+              const SizedBox(height: 16),
 
-              const SizedBox(height: 20),
-              const Text("Native Ad:"),
-              Container(
-                height: 120,
-                child: SimpleAdsManager.instance.native(
-                  nativeTemplateStyle: NativeTemplateStyle(
-                    templateType: TemplateType.medium,
-                    mainBackgroundColor: Colors.white,
-                    cornerRadius: 10.0,
-                    callToActionTextStyle: NativeTemplateTextStyle(
-                      textColor: Colors.white,
-                      backgroundColor: Colors.blue,
-                      size: 16.0,
-                      style: NativeTemplateFontStyle.bold,
-                    ),
-                    primaryTextStyle: NativeTemplateTextStyle(
-                      textColor: Colors.black,
-                      size: 16.0,
-                    ),
-                    secondaryTextStyle: NativeTemplateTextStyle(
-                      textColor: Colors.grey,
-                      size: 14.0,
-                    ),
-                  ),
-                ),
+              const Text("Banner Ad:"),
+              const SizedBox(height: 8),
+              SimpleAdsManager.instance.banner(
+                adUnitId: bannerAdUnitId,
+                onLoaded: () {
+                  debugPrint("Banner loaded");
+                },
+                onFailed: (error) {
+                  debugPrint("Banner failed: $error");
+                },
+                onRevenue: (revenue) {
+                  debugPrint("Banner revenue: $revenue");
+                },
               ),
 
-              const SizedBox(height: 20),
+              const SizedBox(height: 24),
+
+              const Text("Native Ad:"),
+              const SizedBox(height: 8),
+              SimpleAdsManager.instance.nativeAd(
+                adUnitId: nativeAdUnitId,
+                nativeTemplateStyle: NativeTemplateStyle(
+                  templateType: TemplateType.medium,
+                  mainBackgroundColor: Colors.white,
+                  cornerRadius: 10.0,
+                  callToActionTextStyle: NativeTemplateTextStyle(
+                    textColor: Colors.white,
+                    backgroundColor: Colors.blue,
+                    size: 16.0,
+                    style: NativeTemplateFontStyle.bold,
+                  ),
+                  primaryTextStyle: NativeTemplateTextStyle(
+                    textColor: Colors.black,
+                    size: 16.0,
+                  ),
+                  secondaryTextStyle: NativeTemplateTextStyle(
+                    textColor: Colors.grey,
+                    size: 14.0,
+                  ),
+                ),
+                onLoaded: () {
+                  debugPrint("Native loaded");
+                },
+                onFailed: (error) {
+                  debugPrint("Native failed: $error");
+                },
+                onRevenue: (revenue) {
+                  debugPrint("Native revenue: $revenue");
+                },
+              ),
+
+              const SizedBox(height: 24),
+
               ElevatedButton(
                 onPressed: () {
-                  // Show Interstitial Ad
-                  SimpleAdsManager.instance.interstitial(
+                  SimpleAdsManager.instance.loadAndShowInterstitial(
+                    adUnitId: interstitialAdUnitId,
                     context: context,
-                    onDismiss: (adShown) {
-                      debugPrint("Interstitial Ad Dismissed: $adShown");
+                    onShown: () {
+                      debugPrint("Interstitial shown");
+                    },
+                    onDismissed: () {
+                      debugPrint("Interstitial dismissed");
+                    },
+                    onFailed: (error) {
+                      debugPrint("Interstitial failed: $error");
+                    },
+                    onRevenue: (revenue) {
+                      debugPrint("Interstitial revenue: $revenue");
                     },
                   );
                 },
@@ -115,12 +144,38 @@ class HomePage extends StatelessWidget {
 
               ElevatedButton(
                 onPressed: () {
-                  // Show Rewarded Ad
-                  SimpleAdsManager.instance.rewarded(
+                  SimpleAdsManager.instance.showPreloadedInterstitial(
                     context: context,
-                    onRewarded: (reward, adShown) {
+                    adUnitId: interstitialAdUnitId,
+                    onDismiss: (shown) {
+                      debugPrint("Preloaded Interstitial dismissed: $shown");
+                    },
+                    onRevenue: (revenue) {
+                      debugPrint("Preloaded Interstitial revenue: $revenue");
+                    },
+                  );
+                },
+                child: const Text("Show Preloaded Interstitial"),
+              ),
+
+              ElevatedButton(
+                onPressed: () {
+                  SimpleAdsManager.instance.loadAndShowRewarded(
+                    adUnitId: rewardedAdUnitId,
+                    context: context,
+                    onShown: () {
+                      debugPrint("Rewarded shown");
+                    },
+                    onCompleted: (reward, rewardEarned) {
                       debugPrint(
-                          "Rewarded Ad Completed: $adShown, Reward: ${reward?.amount ?? 0}");
+                        "Rewarded completed: earned=$rewardEarned, amount=${reward?.amount ?? 0}",
+                      );
+                    },
+                    onFailed: (error) {
+                      debugPrint("Rewarded failed: $error");
+                    },
+                    onRevenue: (revenue) {
+                      debugPrint("Rewarded revenue: $revenue");
                     },
                   );
                 },
@@ -129,12 +184,22 @@ class HomePage extends StatelessWidget {
 
               ElevatedButton(
                 onPressed: () {
-                  // Show Rewarded Interstitial Ad
-                  SimpleAdsManager.instance.rewardedInterstitial(
+                  SimpleAdsManager.instance.loadAndShowRewardedInterstitial(
+                    adUnitId: rewardedInterstitialAdUnitId,
                     context: context,
-                    onRewarded: (reward, adShown) {
+                    onShown: () {
+                      debugPrint("Rewarded Interstitial shown");
+                    },
+                    onDismissed: (reward, rewardEarned) {
                       debugPrint(
-                          "Rewarded Interstitial Completed: $adShown, Reward: ${reward?.amount ?? 0}");
+                        "Rewarded Interstitial completed: earned=$rewardEarned, amount=${reward?.amount ?? 0}",
+                      );
+                    },
+                    onFailed: (error) {
+                      debugPrint("Rewarded Interstitial failed: $error");
+                    },
+                    onRevenue: (revenue) {
+                      debugPrint("Rewarded Interstitial revenue: $revenue");
                     },
                   );
                 },
@@ -143,16 +208,27 @@ class HomePage extends StatelessWidget {
 
               ElevatedButton(
                 onPressed: () {
-                  // Show App Open Ad manually
-                  SimpleAdsManager.instance.appOpen(
+                  SimpleAdsManager.instance.loadAndShowAppOpen(
+                    adUnitId: appOpenAdUnitId,
                     context: context,
-                    onDismiss: (adShown) {
-                      debugPrint("App Open Ad Dismissed: $adShown");
+                    onShown: () {
+                      debugPrint("App Open Ad Shown");
+                    },
+                    onDismissed: () {
+                      debugPrint("App Open Ad Dismissed");
+                    },
+                    onFailed: (error) {
+                      debugPrint("App Open Ad Failed: $error");
+                    },
+                    onRevenue: (revenue) {
+                      debugPrint("App Open Ad Revenue: $revenue");
                     },
                   );
                 },
                 child: const Text("Show App Open Ad"),
               ),
+
+              const SizedBox(height: 24),
             ],
           ),
         ),

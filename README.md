@@ -1,9 +1,8 @@
-# ✅ simple_ads_manager
+# simple_ads_manager
 
 ### Google Mobile Ads (AdMob) Made Simple for Flutter
 
-A clean, centralized, and production-ready Ads Manager for Flutter apps using **Google Mobile Ads (
-AdMob)**.
+A clean, centralized, and production-ready ads manager for Flutter apps using **Google Mobile Ads (AdMob)**.
 
 ---
 
@@ -11,248 +10,206 @@ AdMob)**.
 
 | Android | iOS |
 |:-------:|:---:|
-|    ✅    |  ✅  |
+|   ✅    | ✅  |
 
 ---
+
+## ✨ Supported Ad Formats
+
+| Ad Type               | Preload Support | Revenue Callback | Lifecycle Aware |
+|-----------------------|-----------------|------------------|-----------------|
+| Banner                | ❌               | ✅                | Inline          |
+| Native (Template)     | ❌               | ✅                | Inline          |
+| Interstitial          | ✅               | ✅                | Manual          |
+| Rewarded              | ❌               | ✅                | Manual          |
+| Rewarded Interstitial | ✅               | ✅                | Manual          |
+| App Open              | ❌               | ✅                | Foreground      |
+| Auto App Open         | ❌               | ✅                | Automatic       |
+
+
 
 ## ✨ Features
 
 - Banner Ads
-- Native Ads (Template based)
-- Interstitial Ads
+- Native Ads (Template-based)
+- Interstitial Ads (Preload support)
 - Rewarded Ads
 - Rewarded Interstitial Ads
 - App Open Ads
-- Auto App Open (Lifecycle based)
+- Auto App Open (Lifecycle-based)
 - Revenue callbacks
-- Clean & fluent API
+- Availability checks
+- Cooldown control
 
 ---
 
-## 📦 Installation
+# 📦 Installation
 
 ```yaml
 dependencies:
   simple_ads_manager: ^0.0.2
 ```
 
-## 📢 Supported Ad Formats
+Run:
 
-| Ad Type               | Description                 |
-|-----------------------|-----------------------------|
-| Banner                | Standard banner ads         |
-| Native                | Template based native ads   |
-| Interstitial          | Fullscreen ads              |
-| Rewarded              | Reward based fullscreen ads |
-| Rewarded Interstitial | Fullscreen + reward         |
-| App Open              | Ads shown on app start      |
-| Auto App Open         | Ads shown on app resume     |
+```bash
+flutter pub get
+```
 
 ---
 
-# 🚀 Usage
+# ⚙️ Setup
 
-Follow the steps below to integrate ads in **minutes**.
+## 1️⃣ Add AdMob App ID
 
----
-
-## Step 1️⃣ Add Dependency
-
-```yaml
-dependencies:
-  simple_ads_manager: ^0.0.2
-````
-
----
-
-## Step 2️⃣ AdMob App ID Setup
-
-### Android (`AndroidManifest.xml`)
+### Android → `AndroidManifest.xml`
 
 ```xml
-
-<meta-data android:name="com.google.android.gms.ads.APPLICATION_ID"
+<meta-data
+    android:name="com.google.android.gms.ads.APPLICATION_ID"
     android:value="REPLACE_WITH_YOUR_ANDROID_APP_ID" />
 ```
 
-### iOS (`Info.plist`)
+### iOS → `Info.plist`
 
 ```xml
-
-<key>GADApplicationIdentifier</key><string>SAMPLE_APP_ID</string>
+<key>GADApplicationIdentifier</key>
+<string>REPLACE_WITH_YOUR_IOS_APP_ID</string>
 ```
 
 ---
 
-## Step 3️⃣ Initialize Ads (Once)
+## 2️⃣ Initialize SDK
 
 ```dart
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-
-  await SimpleAdsManager.instance.initAdsManager(
-    // Android
-    bannerAndroid: "ca-app-pub-xxx",
-    interstitialAndroid: "ca-app-pub-xxx",
-    rewardedAndroid: "ca-app-pub-xxx",
-    rewardedInterstitialAndroid: "ca-app-pub-xxx",
-    nativeAndroid: "ca-app-pub-xxx",
-    appOpenAndroid: "ca-app-pub-xxx",
-
-    // iOS
-    bannerIOS: "ca-app-pub-xxx",
-    interstitialIOS: "ca-app-pub-xxx",
-    rewardedIOS: "ca-app-pub-xxx",
-    rewardedInterstitialIOS: "ca-app-pub-xxx",
-    nativeIOS: "ca-app-pub-xxx",
-    appOpenIOS: "ca-app-pub-xxx",
-  );
-
-  SimpleAdsManager.instance.enableAds(
-    banner: true,
-    native: true,
-    interstitial: true,
-    rewarded: true,
-    rewardedInterstitial: true,
-    appOpen: true,
-  );
-
+  await SimpleAdsManager.instance.init();
   runApp(const MyApp());
 }
 ```
 
 ---
 
-## Step 4️⃣ Show Ads
-
-### 🟢 Banner Ad
+## 3️⃣ Optional: Enable Test Ads
 
 ```dart
-SimpleAdsManager.instance.banner
-(
-onLoaded: () {},
-onRevenue: (revenue) {},
+SimpleAdsManager.alwaysTestADs = true;
+```
+
+---
+
+# 🔥 Usage
+
+---
+
+## 🟢 Banner Ad
+
+```dart
+SimpleAdsManager.instance.banner(
+  adUnitId: "ca-app-pub-xxxxxxxxxxxxxxxx/banner-id",
 );
 ```
 
 ---
 
-### 🟢 Interstitial Ad
+## 🟢 Native Ad
 
 ```dart
-SimpleAdsManager.instance.interstitial
-(
-context: context,
-onDismiss: (adShown) {},
-onRevenue: (revenue) {},
+SimpleAdsManager.instance.nativeAd(
+  adUnitId: "ca-app-pub-xxxxxxxxxxxxxxxx/native-id",
+  nativeTemplateStyle: NativeTemplateStyle(
+    templateType: TemplateType.medium,
+  ),
 );
 ```
 
 ---
 
-### 🟢 Rewarded Ad
+## 🟢 Interstitial (Recommended: Preload)
+
+### Preload
 
 ```dart
-SimpleAdsManager.instance.rewarded
-(
-context: context,
-onRewarded: (reward, adShown) {},
-onRevenue: (revenue) {},
+SimpleAdsManager.instance.preloadInterstitial(
+  adUnitId: "ca-app-pub-xxxxxxxxxxxxxxxx/interstitial-id",
+);
+```
+
+### Show
+
+```dart
+SimpleAdsManager.instance.showPreloadedInterstitial(
+  context: context,
+  adUnitId: "ca-app-pub-xxxxxxxxxxxxxxxx/interstitial-id",
+  onDismiss: (shown) {},
 );
 ```
 
 ---
 
-### 🟢 Rewarded Interstitial Ad
+## 🟢 Rewarded
 
 ```dart
-SimpleAdsManager.instance.rewardedInterstitial
-(
-context: context,
-onRewarded: (reward, adShown) {},
-onRevenue: (revenue) {},
+SimpleAdsManager.instance.loadAndShowRewarded(
+  adUnitId: "ca-app-pub-xxxxxxxxxxxxxxxx/rewarded-id",
+  context: context,
+  onCompleted: (reward, earned) {},
 );
 ```
 
 ---
 
-### 🟢 App Open Ad
+## 🟢 Rewarded Interstitial
 
 ```dart
-SimpleAdsManager.instance.appOpen
-(
-context: context,
-onDismiss: (adShown) {},
-onRevenue: (revenue) {},
+SimpleAdsManager.instance.loadAndShowRewardedInterstitial(
+  adUnitId: "ca-app-pub-xxxxxxxxxxxxxxxx/rewarded-interstitial-id",
+  context: context,
 );
 ```
 
 ---
 
-### 🟢 Auto App Open (Recommended)
-
-Automatically shows App Open ads when app resumes.
+## 🟢 App Open
 
 ```dart
-SimpleAdsManager.instance.autoAppOpen
-(
-context: context,
-onDismiss: (adShown) {},
-onRevenue: (revenue) {},
+SimpleAdsManager.instance.loadAndShowAppOpen(
+  adUnitId: "ca-app-pub-xxxxxxxxxxxxxxxx/app-open-id",
+  context: context,
 );
 ```
 
 ---
 
-### 🟢 Native Ad
+## 🟢 Auto App Open (Best Practice)
 
 ```dart
-import 'package:simple_ads_manager/simple_ads_manager.dart';
-
-SimpleAdsManager.instance.native
-(
-nativeTemplateStyle: NativeTemplateStyle(
-templateType: TemplateType.medium,
-mainBackgroundColor: Colors.white,
-cornerRadius: 10,
-callToActionTextStyle: NativeTemplateTextStyle(
-textColor: Colors.white,
-backgroundColor: Colors.blue,
-size: 16,
-),
-primaryTextStyle: NativeTemplateTextStyle(
-textColor: Colors.black,
-size: 14,
-),
-secondaryTextStyle: NativeTemplateTextStyle(
-textColor: Colors.grey,
-size: 12,
-),
-),
-onLoaded: () {},
-onRevenue: (revenue) {},
+SimpleAdsManager.instance.showAppStateAppOpen(
+  adUnitId: "ca-app-pub-xxxxxxxxxxxxxxxx/app-open-id",
+  context: context,
 );
 ```
 
 ---
 
-## 🔍 Check Ad Availability
+## 🧠 Check Ad Availability
 
 ```dart
-
 bool ready =
-SimpleAdsManager.instance.isAvailable(AdType.interstitial);
+    SimpleAdsManager.instance.isInterstitialReady;
 ```
 
 ---
 
-## ⚠️ Best Practices
+# 💡 Best Practices
 
-* Initialize ads before usage
-* Use test ads during development
-* Avoid showing ads back-to-back
-* Always check availability
-* Follow AdMob policies
+- Initialize SDK before showing ads.
+- Preload fullscreen ads for better UX.
+- Avoid showing ads back-to-back.
+- Use natural transition points.
+- Always use test ads during development.
+- Follow AdMob policies strictly.
 
 ---
 
@@ -268,5 +225,3 @@ Google Mobile Ads Specialist
 ## 📄 License
 
 MIT License © 2025 Zeeshan Ali
-
-```

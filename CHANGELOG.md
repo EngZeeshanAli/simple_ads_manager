@@ -1,6 +1,44 @@
 # Changelog
 
-## 0.0.9
+## 1.1.0
+
+### Added
+
+- Preload support for Interstitial ads.
+- Preload support for Rewarded Interstitial ads.
+- `showPreloadedInterstitial()` method.
+- `showPreloadedRewardedInterstitial()` method.
+- Availability getters:
+    - `isInterstitialReady`
+    - `isRewardedReady`
+    - `isRewardedInterstitialReady`
+- App Open cooldown control via `setAppOpenCooldown()`.
+- Unified `loadAndShow` API pattern for fullscreen ads.
+- Explicit `adUnitId` parameter for all ad calls.
+
+---
+
+### Changed
+
+- Removed `initAdsManager()` in favor of simplified `init()`.
+- Removed `enableAds()` global toggles.
+- Removed old generic `isAvailable(adType)` usage.
+- Refactored ad lifecycle handling.
+- Refactored fullscreen ad disposal and reload flow.
+- Improved preload stability and show rate optimization.
+- Standardized revenue callback handling across all ad types.
+
+---
+
+### Fixed
+
+- Fixed duplicate ad show edge cases.
+- Fixed improper ad disposal after dismissal.
+- Fixed multiple load calls during preload.
+- Fixed App Open lifecycle resume behavior.
+- Improved memory safety.
+
+## 1.0.0
 
 ### Added
 

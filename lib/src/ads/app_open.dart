@@ -4,86 +4,101 @@ import 'package:simple_ads_manager/src/models/AdConfig.dart';
 import 'package:simple_ads_manager/src/utils/simple_overlay.dart';
 
 class AdmobAppOpen {
-  static AppOpenAd? appOpenAd;
+  static bool _isShowing = false;
+  static DateTime? _lastShown;
+  static Duration cooldown = const Duration(minutes: 1);
 
-  static void loadAppOpen() {
-    if (AdConfig.enableAppOpen == false) {
-      debugPrint('⚠️ App Open ads are disabled.');
+  static void loadAndShow({
+    required String adUnitId,
+    required BuildContext context,
+    Function()? onShown,
+    Function()? onDismissed,
+    Function(String error)? onFailed,
+    Function(double revenue)? onRevenue,
+  }) {
+    // Prevent multiple simultaneous shows
+    if (_isShowing) return;
+
+    // Cooldown check
+    if (_lastShown != null &&
+        DateTime.now().difference(_lastShown!) < cooldown) {
       return;
     }
+
     AppOpenAd.load(
-      adUnitId: AdConfig.getAppOpen(),
+      adUnitId: AdConfig.getAppOpen(adUnitId),
       request: const AdRequest(),
       adLoadCallback: AppOpenAdLoadCallback(
         onAdLoaded: (ad) {
-          appOpenAd = ad;
           debugPrint('✅ App Open Ad loaded');
+
+          ad.onPaidEvent = (
+            Ad ad,
+            double valueMicros,
+            PrecisionType precision,
+            String currencyCode,
+          ) {
+            final revenue = valueMicros / 1000000;
+            debugPrint('💰 App Open revenue: $revenue $currencyCode');
+            onRevenue?.call(revenue);
+          };
+
+          ad.fullScreenContentCallback = FullScreenContentCallback(
+            onAdShowedFullScreenContent: (ad) {
+              _isShowing = true;
+              _lastShown = DateTime.now();
+              onShown?.call();
+            },
+            onAdFailedToShowFullScreenContent: (ad, error) {
+              _isShowing = false;
+              ad.dispose();
+              SimpleOverlay.dismiss();
+              onFailed?.call(error.message);
+            },
+            onAdDismissedFullScreenContent: (ad) {
+              _isShowing = false;
+              ad.dispose();
+              SimpleOverlay.dismiss();
+              onDismissed?.call();
+            },
+          );
+
+          SimpleOverlay.show(context);
+          ad.show();
         },
         onAdFailedToLoad: (error) {
-          appOpenAd = null;
           debugPrint('❌ App Open Ad failed to load: $error');
+          onFailed?.call(error.message);
         },
       ),
     );
   }
-
-  static void show(
-      {required BuildContext context,
-      Function(bool adShown)? onDismiss,
-      Function(double revenue)? onRevenue}) {
-    if (appOpenAd != null) {
-      appOpenAd!.fullScreenContentCallback = FullScreenContentCallback(
-        onAdShowedFullScreenContent: (ad) {},
-        onAdFailedToShowFullScreenContent: (ad, error) {
-          ad.dispose();
-          appOpenAd = null;
-          loadAppOpen();
-        },
-        onAdDismissedFullScreenContent: (ad) {
-          SimpleOverlay.dismiss();
-          ad.dispose();
-          appOpenAd = null;
-          loadAppOpen();
-          onDismiss?.call(true);
-        },
-      );
-
-      appOpenAd!.onPaidEvent = (Ad ad, double valueMicros,
-          PrecisionType precision, String currencyCode) {
-        double revenue =
-            valueMicros / 1000000; // convert micros to currency units
-        debugPrint('💰 App Open revenue: $revenue $currencyCode');
-        onRevenue?.call(revenue);
-      };
-      SimpleOverlay.show(context);
-      appOpenAd?.show();
-    } else {
-      onDismiss?.call(false);
-      loadAppOpen();
-    }
-  }
 }
 
 class AppLifecycleReactorForAppOpen {
-  void listenToAppStateChanges(
-      {required BuildContext context,
-      Function(bool adShown)? onDismiss,
-      Function(double revenue)? onRevenue}) {
+  void listenToAppStateChanges({
+    required String adUnitId,
+    required BuildContext context,
+    Function()? onShown,
+    Function()? onDismissed,
+    Function(String error)? onFailed,
+    Function(double revenue)? onRevenue,
+  }) {
     AppStateEventNotifier.startListening();
-    AppStateEventNotifier.appStateStream.forEach(
-        (state) => _onAppStateChanged(context, state, onDismiss, onRevenue));
-  }
 
-  void _onAppStateChanged(BuildContext context, AppState appState,
-      Function(bool adShown)? onDismiss, Function(double revenue)? onRevenue) {
-    if (appState == AppState.foreground) {
-      debugPrint("⚠️ App has come to foreground, show App Open Ad");
+    AppStateEventNotifier.appStateStream.listen((state) {
+      if (state == AppState.foreground) {
+        debugPrint("⚠️ App foreground → App Open");
 
-      AdmobAppOpen.show(
-        context: context,
-        onDismiss: onDismiss,
-        onRevenue: onRevenue,
-      );
-    }
+        AdmobAppOpen.loadAndShow(
+          adUnitId: adUnitId,
+          context: context,
+          onShown: onShown,
+          onDismissed: onDismissed,
+          onFailed: onFailed,
+          onRevenue: onRevenue,
+        );
+      }
+    });
   }
 }

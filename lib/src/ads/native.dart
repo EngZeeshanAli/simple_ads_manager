@@ -2,86 +2,135 @@ import 'package:flutter/material.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:simple_ads_manager/src/models/AdConfig.dart';
 
-class AdMobNative extends StatelessWidget {
-  final NativeTemplateStyle style;
-  final Function()? onLoaded;
+class AdMobNative extends StatefulWidget {
+  final String adUnitId;
+  final NativeTemplateStyle? nativeTemplateStyle;
+  final double? height;
+  final Widget? loadingWidget;
+  final Widget? errorWidget;
+  final VoidCallback? onLoaded;
+  final Function(String error)? onFailed;
   final Function(double revenue)? onRevenue;
-  final ValueNotifier<NativeAd?> _adNotifier = ValueNotifier(null);
 
-  AdMobNative({
+  const AdMobNative({
     super.key,
-    required this.style,
+    required this.adUnitId,
+    this.nativeTemplateStyle,
+    this.height,
+    this.loadingWidget,
+    this.errorWidget,
     this.onLoaded,
+    this.onFailed,
     this.onRevenue,
-  }) {
-    _load();
+  });
+
+  @override
+  State<AdMobNative> createState() => _AdMobNativeState();
+}
+
+class _AdMobNativeState extends State<AdMobNative> {
+  NativeAd? _nativeAd;
+  bool _isLoaded = false;
+  bool _isFailed = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadAd();
   }
 
-  void _load() {
-    if (!AdConfig.enableNative) {
-      debugPrint('⚠️ Native ads are disabled.');
-      return;
-    }
+  void _loadAd() {
+    _nativeAd?.dispose();
+    _nativeAd = null;
+    _isLoaded = false;
+    _isFailed = false;
 
-    debugPrint('⚠️ Loading Native Ad...');
     final nativeAd = NativeAd(
-      adUnitId: AdConfig.getNative(),
+      adUnitId: AdConfig.getNative(widget.adUnitId),
       request: const AdRequest(),
-      nativeTemplateStyle: style,
+      nativeTemplateStyle: widget.nativeTemplateStyle ??
+          NativeTemplateStyle(
+            templateType: TemplateType.medium,
+          ),
       listener: NativeAdListener(
         onAdLoaded: (ad) {
-          debugPrint('✅ NativeAd loaded.');
-          _adNotifier.value = ad as NativeAd;
-          onLoaded?.call();
+          if (!mounted) {
+            ad.dispose();
+            return;
+          }
+
+          _nativeAd = ad as NativeAd;
+          setState(() {
+            _isLoaded = true;
+            _isFailed = false;
+          });
+          widget.onLoaded?.call();
         },
         onAdFailedToLoad: (ad, error) {
-          debugPrint('❌ NativeAd failed to load: $error');
           ad.dispose();
+          if (!mounted) return;
+
+          setState(() {
+            _nativeAd = null;
+            _isLoaded = false;
+            _isFailed = true;
+          });
+          widget.onFailed?.call(error.message);
         },
         onPaidEvent: (ad, valueMicros, precision, currencyCode) {
-          double revenue = valueMicros / 1e6;
-          debugPrint('💰 Native Ad revenue: $revenue $currencyCode');
-          onRevenue?.call(revenue);
+          final revenue = valueMicros / 1000000;
+          widget.onRevenue?.call(revenue);
         },
       ),
     );
 
+    _nativeAd = nativeAd;
     nativeAd.load();
+  }
 
-    // Dispose previous ad if reloaded
-    _adNotifier.addListener(() {
-      if (_adNotifier.value != nativeAd) {
-        _adNotifier.value?.dispose();
-        debugPrint('🗑️ Previous NativeAd disposed.');
-      }
-    });
+  @override
+  void dispose() {
+    _nativeAd?.dispose();
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    return ValueListenableBuilder<NativeAd?>(
-      valueListenable: _adNotifier,
-      builder: (context, ad, _) {
-        if (ad == null) return const SizedBox();
-        final constraints = style.templateType == TemplateType.small
-            ? const BoxConstraints(
-                minWidth: 320,
-                minHeight: 90,
-                maxWidth: 400,
-                maxHeight: 100,
-              )
-            : const BoxConstraints(
-                minWidth: 320,
-                minHeight: 320,
-                maxWidth: 400,
-                maxHeight: 350,
-              );
+    if (_isFailed) {
+      return widget.errorWidget ?? const SizedBox.shrink();
+    }
 
-        return ConstrainedBox(
-          constraints: constraints,
-          child: Center(child: AdWidget(ad: ad)),
+    if (!_isLoaded || _nativeAd == null) {
+      if (widget.height != null) {
+        return SizedBox(
+          height: widget.height,
+          child: widget.loadingWidget ?? const SizedBox.shrink(),
         );
-      },
+      }
+      return widget.loadingWidget ?? const SizedBox.shrink();
+    }
+
+    final templateType =
+        widget.nativeTemplateStyle?.templateType ?? TemplateType.medium;
+
+
+    final BoxConstraints constraints = templateType == TemplateType.small
+        ? const BoxConstraints(
+            minWidth: 320, // minimum recommended width
+            minHeight: 90, // minimum recommended height
+            maxWidth: 400,
+            maxHeight: 120,
+          )
+        : const BoxConstraints(
+            minWidth: 320, // minimum recommended width
+            minHeight: 320, // minimum recommended height
+            maxWidth: 400,
+            maxHeight: 350,
+          );
+
+    return ConstrainedBox(
+      constraints: constraints,
+      child: AdWidget(ad: _nativeAd!),
     );
   }
 }
