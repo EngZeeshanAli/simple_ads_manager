@@ -45,9 +45,9 @@ class TestAdUnits {
 
   static String get appOpenAdUnitId {
     if (Platform.isAndroid) {
-      return "ca-app-pub-3940256099942544/3419835294";
+      return "ca-app-pub-3940256099942544/9257395921";
     } else if (Platform.isIOS) {
-      return "ca-app-pub-3940256099942544/5662855259";
+      return "ca-app-pub-3940256099942544/5575463023";
     } else {
       throw UnsupportedError("Unsupported platform");
     }
