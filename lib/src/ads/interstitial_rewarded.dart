@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:simple_ads_manager/src/utils/simple_overlay.dart';
-import '../models/AdConfig.dart';
+import '../models/ad_config.dart';
 
 class AdmobRewardedInterstitial {
   static bool _isShowing = false;

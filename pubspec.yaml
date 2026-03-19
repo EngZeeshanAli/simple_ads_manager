@@ -1,6 +1,6 @@
 name: simple_ads_manager
-description: An easy way to use google ads in flutter.
-version: 1.1.0
+description: An easy-to-use Flutter plugin for integrating all Google Mobile Ads formats, including banner, native, interstitial, and rewarded ads, to maximize app revenue.
+version: 1.1.1
 license: MIT
 homepage: https://engzeeshanali.github.io/
 

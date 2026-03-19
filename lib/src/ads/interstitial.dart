@@ -1,13 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:simple_ads_manager/src/utils/simple_overlay.dart';
-import '../models/AdConfig.dart';
+import '../models/ad_config.dart';
 
 class AdmobInterstitial {
   static bool _isShowing = false;
   static InterstitialAd? _interstitialAd;
   static bool _isLoading = false;
-
   static bool get isReady => _interstitialAd != null;
 
 
@@ -28,10 +27,12 @@ class AdmobInterstitial {
         onAdLoaded: (ad) {
           debugPrint('✅ Interstitial Ad loaded');
 
-          ad.onPaidEvent = (Ad ad,
-              double valueMicros,
-              PrecisionType precision,
-              String currencyCode,) {
+          ad.onPaidEvent = (
+            Ad ad,
+            double valueMicros,
+            PrecisionType precision,
+            String currencyCode,
+          ) {
             final revenue = valueMicros / 1000000;
             debugPrint('💰 Interstitial revenue: $revenue $currencyCode');
             onRevenue?.call(revenue);
@@ -71,6 +72,8 @@ class AdmobInterstitial {
   }
 
 
+
+
   /// Preload interstitial
   static void preload(String adUnitId) {
     if (_interstitialAd != null || _isLoading) return;
@@ -82,11 +85,9 @@ class AdmobInterstitial {
       request: const AdRequest(),
       adLoadCallback: InterstitialAdLoadCallback(
         onAdLoaded: (ad) {
-          _interstitialAd?.dispose();
           _interstitialAd = ad;
           _isLoading = false;
           debugPrint('✅ Interstitial preloaded');
-
         },
         onAdFailedToLoad: (error) {
           _isLoading = false;
@@ -113,10 +114,12 @@ class AdmobInterstitial {
     final ad = _interstitialAd!;
     _interstitialAd = null;
 
-    ad.onPaidEvent = (Ad ad,
-        double valueMicros,
-        PrecisionType precision,
-        String currencyCode,) {
+    ad.onPaidEvent = (
+      Ad ad,
+      double valueMicros,
+      PrecisionType precision,
+      String currencyCode,
+    ) {
       final revenue = valueMicros / 1e6;
       onRevenue?.call(revenue);
     };

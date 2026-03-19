@@ -2,7 +2,8 @@
 
 ### Google Mobile Ads (AdMob) Made Simple for Flutter
 
-A clean, centralized, and production-ready ads manager for Flutter apps using **Google Mobile Ads (AdMob)**.
+A clean, centralized, and production-ready ads manager for Flutter apps using **Google Mobile Ads (
+AdMob)**.
 
 ---
 
@@ -10,7 +11,7 @@ A clean, centralized, and production-ready ads manager for Flutter apps using **
 
 | Android | iOS |
 |:-------:|:---:|
-|   ✅    | ✅  |
+|    ✅    |  ✅  |
 
 ---
 
@@ -25,8 +26,6 @@ A clean, centralized, and production-ready ads manager for Flutter apps using **
 | Rewarded Interstitial | ✅               | ✅                | Manual          |
 | App Open              | ❌               | ✅                | Foreground      |
 | Auto App Open         | ❌               | ✅                | Automatic       |
-
-
 
 ## ✨ Features
 
@@ -65,16 +64,16 @@ flutter pub get
 ### Android → `AndroidManifest.xml`
 
 ```xml
-<meta-data
-    android:name="com.google.android.gms.ads.APPLICATION_ID"
+
+<meta-data android:name="com.google.android.gms.ads.APPLICATION_ID"
     android:value="REPLACE_WITH_YOUR_ANDROID_APP_ID" />
 ```
 
 ### iOS → `Info.plist`
 
 ```xml
-<key>GADApplicationIdentifier</key>
-<string>REPLACE_WITH_YOUR_IOS_APP_ID</string>
+
+<key>GADApplicationIdentifier</key><string>REPLACE_WITH_YOUR_IOS_APP_ID</string>
 ```
 
 ---
@@ -106,8 +105,14 @@ SimpleAdsManager.alwaysTestADs = true;
 ## 🟢 Banner Ad
 
 ```dart
-SimpleAdsManager.instance.banner(
-  adUnitId: "ca-app-pub-xxxxxxxxxxxxxxxx/banner-id",
+SimpleAdsManager.instance.banner
+(
+adUnitId
+:
+"
+ca-app-pub-xxxxxxxxxxxxxxxx/banner-id
+"
+,
 );
 ```
 
@@ -116,11 +121,17 @@ SimpleAdsManager.instance.banner(
 ## 🟢 Native Ad
 
 ```dart
-SimpleAdsManager.instance.nativeAd(
-  adUnitId: "ca-app-pub-xxxxxxxxxxxxxxxx/native-id",
-  nativeTemplateStyle: NativeTemplateStyle(
-    templateType: TemplateType.medium,
-  ),
+SimpleAdsManager.instance.nativeAd
+(
+adUnitId: "ca-app-pub-xxxxxxxxxxxxxxxx/native-id",
+nativeTemplateStyle: NativeTemplateStyle(
+templateType:
+TemplateType
+.
+medium
+,
+)
+,
 );
 ```
 
@@ -131,18 +142,25 @@ SimpleAdsManager.instance.nativeAd(
 ### Preload
 
 ```dart
-SimpleAdsManager.instance.preloadInterstitial(
-  adUnitId: "ca-app-pub-xxxxxxxxxxxxxxxx/interstitial-id",
+SimpleAdsManager.instance.preloadInterstitial
+(
+adUnitId
+:
+"
+ca-app-pub-xxxxxxxxxxxxxxxx/interstitial-id
+"
+,
 );
 ```
 
 ### Show
 
 ```dart
-SimpleAdsManager.instance.showPreloadedInterstitial(
-  context: context,
-  adUnitId: "ca-app-pub-xxxxxxxxxxxxxxxx/interstitial-id",
-  onDismiss: (shown) {},
+SimpleAdsManager.instance.showPreloadedInterstitial
+(
+context: context,
+adUnitId: "ca-app-pub-xxxxxxxxxxxxxxxx/interstitial-id",
+onDismiss: (shown) {},
 );
 ```
 
@@ -151,10 +169,11 @@ SimpleAdsManager.instance.showPreloadedInterstitial(
 ## 🟢 Rewarded
 
 ```dart
-SimpleAdsManager.instance.loadAndShowRewarded(
-  adUnitId: "ca-app-pub-xxxxxxxxxxxxxxxx/rewarded-id",
-  context: context,
-  onCompleted: (reward, earned) {},
+SimpleAdsManager.instance.loadAndShowRewarded
+(
+adUnitId: "ca-app-pub-xxxxxxxxxxxxxxxx/rewarded-id",
+context: context,
+onCompleted: (reward, earned) {},
 );
 ```
 
@@ -163,9 +182,10 @@ SimpleAdsManager.instance.loadAndShowRewarded(
 ## 🟢 Rewarded Interstitial
 
 ```dart
-SimpleAdsManager.instance.loadAndShowRewardedInterstitial(
-  adUnitId: "ca-app-pub-xxxxxxxxxxxxxxxx/rewarded-interstitial-id",
-  context: context,
+SimpleAdsManager.instance.loadAndShowRewardedInterstitial
+(
+adUnitId: "ca-app-pub-xxxxxxxxxxxxxxxx/rewarded-interstitial-id",
+context: context,
 );
 ```
 
@@ -174,9 +194,10 @@ SimpleAdsManager.instance.loadAndShowRewardedInterstitial(
 ## 🟢 App Open
 
 ```dart
-SimpleAdsManager.instance.loadAndShowAppOpen(
-  adUnitId: "ca-app-pub-xxxxxxxxxxxxxxxx/app-open-id",
-  context: context,
+SimpleAdsManager.instance.loadAndShowAppOpen
+(
+adUnitId: "ca-app-pub-xxxxxxxxxxxxxxxx/app-open-id",
+context: context,
 );
 ```
 
@@ -185,9 +206,10 @@ SimpleAdsManager.instance.loadAndShowAppOpen(
 ## 🟢 Auto App Open (Best Practice)
 
 ```dart
-SimpleAdsManager.instance.showAppStateAppOpen(
-  adUnitId: "ca-app-pub-xxxxxxxxxxxxxxxx/app-open-id",
-  context: context,
+SimpleAdsManager.instance.showAppStateAppOpen
+(
+adUnitId: "ca-app-pub-xxxxxxxxxxxxxxxx/app-open-id",
+context: context,
 );
 ```
 
@@ -196,6 +218,7 @@ SimpleAdsManager.instance.showAppStateAppOpen(
 ## 🧠 Check Ad Availability
 
 ```dart
+
 bool ready =
     SimpleAdsManager.instance.isInterstitialReady;
 ```

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
-import 'package:simple_ads_manager/src/models/AdConfig.dart';
+import 'package:simple_ads_manager/src/models/ad_config.dart';
 
 class AdMobBanner extends StatefulWidget {
   final String adUnitId;

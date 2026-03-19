@@ -57,7 +57,9 @@ class SimpleAdsManager {
   Widget nativeAd({
     required String adUnitId,
     NativeTemplateStyle? nativeTemplateStyle,
+    String? factory,
     double? height,
+    BoxConstraints? constraints,
     Widget? loadingWidget,
     Widget? errorWidget,
     VoidCallback? onLoaded,
@@ -67,7 +69,9 @@ class SimpleAdsManager {
     return AdMobNative(
       adUnitId: adUnitId,
       nativeTemplateStyle: nativeTemplateStyle,
+      factory: factory,
       height: height,
+      constraints: constraints,
       loadingWidget: loadingWidget,
       errorWidget: errorWidget,
       onLoaded: onLoaded,

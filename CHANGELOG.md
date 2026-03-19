@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.1.1
+ 
+- factory added for native ad to allow for custom templates and better integration with existing
+  native ad implementations.
+
 ## 1.1.0
 
 ### Added

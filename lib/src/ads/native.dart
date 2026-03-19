@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
-import 'package:simple_ads_manager/src/models/AdConfig.dart';
+import 'package:simple_ads_manager/src/models/ad_config.dart';
 
 class AdMobNative extends StatefulWidget {
   final String adUnitId;
   final NativeTemplateStyle? nativeTemplateStyle;
+  final String? factory;
   final double? height;
+  final BoxConstraints? constraints;
   final Widget? loadingWidget;
   final Widget? errorWidget;
   final VoidCallback? onLoaded;
@@ -16,7 +18,9 @@ class AdMobNative extends StatefulWidget {
     super.key,
     required this.adUnitId,
     this.nativeTemplateStyle,
+    this.factory,
     this.height,
+    this.constraints,
     this.loadingWidget,
     this.errorWidget,
     this.onLoaded,
@@ -48,10 +52,13 @@ class _AdMobNativeState extends State<AdMobNative> {
     final nativeAd = NativeAd(
       adUnitId: AdConfig.getNative(widget.adUnitId),
       request: const AdRequest(),
-      nativeTemplateStyle: widget.nativeTemplateStyle ??
-          NativeTemplateStyle(
-            templateType: TemplateType.medium,
-          ),
+      factoryId: widget.factory,
+      nativeTemplateStyle: widget.factory != null
+          ? null
+          : widget.nativeTemplateStyle ??
+              NativeTemplateStyle(
+                templateType: TemplateType.medium,
+              ),
       listener: NativeAdListener(
         onAdLoaded: (ad) {
           if (!mounted) {
@@ -113,7 +120,6 @@ class _AdMobNativeState extends State<AdMobNative> {
     final templateType =
         widget.nativeTemplateStyle?.templateType ?? TemplateType.medium;
 
-
     final BoxConstraints constraints = templateType == TemplateType.small
         ? const BoxConstraints(
             minWidth: 320, // minimum recommended width
@@ -129,7 +135,7 @@ class _AdMobNativeState extends State<AdMobNative> {
           );
 
     return ConstrainedBox(
-      constraints: constraints,
+      constraints: widget.constraints ?? constraints,
       child: AdWidget(ad: _nativeAd!),
     );
   }
